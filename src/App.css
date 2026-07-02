@@ -1,0 +1,64 @@
+@import 'tailwindcss';
+
+
+@layer utilities {
+  @keyframes borderDraw {
+    0% {
+      border-color: transparent;
+    }
+
+    50% {
+      border-color: #833305cb;
+      /* blue-500 */
+    }
+
+    100% {
+      border-color: transparent;
+    }
+  }
+
+@keyframes comboFillWipe {
+  /* Reveal from left to right */
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  40% {
+    clip-path: inset(0 0 0 0);
+  }
+
+  /* Pause */
+  60% {
+    clip-path: inset(0 0 0 0);
+  }
+
+  /* Hide from left to right */
+  80% {
+    clip-path: inset(0 0 0 100%);
+  }
+
+  100% {
+    clip-path: inset(0 0 0 100%);
+  }
+}
+
+
+
+
+  
+
+  .animate-border-draw {
+    animation: borderDraw 3s linear infinite;
+     box-shadow: 0 0 10px rgba(147, 62, 1, 0.6);
+  }
+
+
+
+.animate-combo {
+  animation: comboFillWipe 7s ease-in-out infinite;
+}
+
+
+
+
+}
