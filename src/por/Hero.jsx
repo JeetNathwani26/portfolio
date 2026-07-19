@@ -4,8 +4,14 @@ import photo from "../assets/photo5.png";
 import "../App.css";
 import Animation from "./Animation";
 import TypingEffect from "./TypingEffect";
+import { getEmailLink } from "./utils";
+
 
 const Hero = ({ onViewWork }) => {
+  const emailHref = getEmailLink();
+  const emailTarget = emailHref.startsWith("mailto:") ? undefined : "_blank";
+  const emailRel = emailHref.startsWith("mailto:") ? undefined : "noopener noreferrer";
+
   return (
     <section id="home" className="relative min-h-[calc(100vh-64px)] pt-6 md:pt-16 pb-12 md:pb-0 overflow-hidden">
       {/* Dynamic Aurora Mesh & Wave Strokes Background */}
@@ -289,7 +295,7 @@ const Hero = ({ onViewWork }) => {
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.6 }}
               className="flex justify-center md:justify-start gap-6 mb-6"
             >
-              <a href="https://mail.google.com/mail/?view=cm&fs=1&to=jeetnathwani660@gmail.com" target="_blank" className="theme-icon transition-colors hover:scale-110" aria-label="Email"><Mail size={24} /></a>
+              <a href={emailHref} target={emailTarget} rel={emailRel} className="theme-icon transition-colors hover:scale-110" aria-label="Email"><Mail size={24} /></a>
               <a href="https://github.com/JeetNathwani26" target="_blank" rel="noopener noreferrer" className="theme-icon transition-colors hover:scale-110" aria-label="GitHub"><Github size={24} /></a>
               <a href="https://www.linkedin.com/in/jeet-nathwani-274a06271/" target="_blank" rel="noopener noreferrer" className="theme-icon transition-colors hover:scale-110" aria-label="LinkedIn"><Linkedin size={24} /></a>
               <a href="https://wa.me/917567120438" target="_blank" rel="noopener noreferrer" className="theme-icon transition-colors hover:scale-110" aria-label="WhatsApp"><MessageCircle size={24} /></a>
