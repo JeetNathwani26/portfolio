@@ -42,7 +42,7 @@ function Effect() {
 
         {/* Subtitle */}
         <p className="text-light opacity-75 mt-3 fs-6 fs-md-5">
-          Full Stack Developer • MERN • React
+          Full Stack Developer • Laravel • React
         </p>
 
         {/* CTA Buttons */}
