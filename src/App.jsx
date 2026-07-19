@@ -1,17 +1,16 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import './App.css'
+import './App.css';
 import Home from './por/Hero';
 import Nav from './por/Nav.jsx';
 import About from './por/About.jsx';
 import Projects from './por/Project.jsx';
 import Contact from './por/Contact.jsx';
 import Resume from './por/Resume.jsx';
-import Loader from './por/Loader.jsx';
+import IntroLoader from './por/IntroLoader.jsx';
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [targetHref, setTargetHref] = useState(null);
+  const [showIntro, setShowIntro] = useState(true);
   const [theme, setTheme] = useState(() => {
     const savedTheme = window.localStorage.getItem("portfolio-theme");
     if (savedTheme) {
@@ -27,67 +26,59 @@ function App() {
   }, [theme]);
 
   useEffect(() => {
-    // Initial loading time
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (!isLoading && targetHref) {
-      // Small delay to ensure any layout shifts have settled before scrolling
-      const scrollTimer = setTimeout(() => {
-        const element = document.querySelector(targetHref);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
-        setTargetHref(null); // Reset target
-      }, 100);
-      return () => clearTimeout(scrollTimer);
-    }
-  }, [isLoading, targetHref]);
+    // Prevent scrolling during intro loader
+    document.body.style.overflow = showIntro ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [showIntro]);
 
   const handleNavigate = (href) => {
-    // Don't show loader if we are already there, but let's just do it anyway for effect
-    setTargetHref(href);
-    setIsLoading(true);
-    // Loader displays for 1.5s during navigation
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
+    const element = document.querySelector(href);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const toggleTheme = () => {
     setTheme((currentTheme) => (currentTheme === "dark" ? "light" : "dark"));
   };
 
+  const handleIntroComplete = () => {
+    setShowIntro(false);
+  };
+
   return (
     <>
       <AnimatePresence>
-        {isLoading && (
+        {showIntro && (
           <motion.div
             key="loader"
             className="fixed inset-0 z-[100]"
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5 }}
           >
-            <Loader />
+            <IntroLoader onComplete={handleIntroComplete} />
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="theme-page min-h-screen">
-        <Nav onNavigate={handleNavigate} theme={theme} onToggleTheme={toggleTheme} />
-        <Home />
-        <About />
-        <Projects />
-        <Contact />
-        <Resume />
+      <div className="theme-page min-h-screen overflow-x-hidden relative">
+        <div className="relative z-50">
+          <Nav onNavigate={handleNavigate} theme={theme} onToggleTheme={toggleTheme} />
+        </div>
+
+        <div>
+          <Home onViewWork={() => handleNavigate('#projects')} />
+          <About />
+          <Projects />
+          <Resume />
+          <Contact />
+        </div>
       </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
+

@@ -14,17 +14,65 @@ const navLinks = [
 const Nav = ({ onNavigate, theme, onToggleTheme }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState(() => {
+    if (typeof window !== "undefined" && window.location.hash) {
+      return window.location.hash;
+    }
+    return "#home";
+  });
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+
+      // Fallback: highlight first section at top, last section at bottom
+      if (window.scrollY < 50) {
+        setActiveSection("#home");
+      } else if (
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 50
+      ) {
+        setActiveSection("#contact");
+      }
+    };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: "-20% 0px -60% 0px",
+      threshold: 0,
+    };
+
+    const handleIntersection = (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveSection(`#${entry.target.id}`);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(handleIntersection, observerOptions);
+
+    navLinks.forEach((link) => {
+      const element = document.querySelector(link.href);
+      if (element) {
+        observer.observe(element);
+      }
+    });
+
+    return () => {
+      observer.disconnect();
+    };
   }, []);
 
   const handleLinkClick = (e, href) => {
     if (onNavigate) {
       e.preventDefault();
       setIsMobileMenuOpen(false);
+      setActiveSection(href);
       onNavigate(href);
     }
   };
@@ -34,9 +82,8 @@ const Nav = ({ onNavigate, theme, onToggleTheme }) => {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`fixed top-0 right-0 w-full z-50 transition-all duration-300 ${
-        isScrolled ? "theme-surface-strong shadow-md" : "bg-transparent"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "theme-surface-strong shadow-md" : "bg-transparent"
+        }`}
     >
       <div className="w-full p-4 flex items-center justify-between theme-surface shadow-sm">
         <a href="#" className="text-xl font-bold theme-primary transition-colors">
@@ -44,17 +91,28 @@ const Nav = ({ onNavigate, theme, onToggleTheme }) => {
         </a>
 
         <ul className="hidden md:flex items-center gap-6">
-          {navLinks.map((link) => (
-            <li key={link.label}>
-              <a
-                href={link.href}
-                onClick={(e) => handleLinkClick(e, link.href)}
-                className="text-sm font-medium theme-muted hover:text-[color:var(--page-primary)] transition-colors cursor-pointer"
-              >
-                {link.label}
-              </a>
-            </li>
-          ))}
+          {navLinks.map((link) => {
+            const isActive = activeSection === link.href;
+            return (
+              <li key={link.label} className="relative py-2">
+                <a
+                  href={link.href}
+                  onClick={(e) => handleLinkClick(e, link.href)}
+                  className={`text-sm font-medium transition-colors cursor-pointer ${isActive ? "text-[color:var(--page-primary)] font-semibold" : "theme-muted hover:text-[color:var(--page-primary)]"
+                    }`}
+                >
+                  {link.label}
+                </a>
+                {isActive && (
+                  <motion.div
+                    layoutId="activeUnderline"
+                    className="absolute bottom-0 left-0 right-0 h-[2px] theme-primary-bg"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
+              </li>
+            );
+          })}
           <li>
             <ThemeToggle theme={theme} onToggle={onToggleTheme} className="px-3 py-2" />
           </li>
@@ -101,17 +159,28 @@ const Nav = ({ onNavigate, theme, onToggleTheme }) => {
           className="md:hidden theme-surface-strong border-b shadow-md rounded-b-lg"
         >
           <ul className="container mx-auto px-6 py-4 flex flex-col gap-4 items-center w-full">
-            {navLinks.map((link) => (
-              <li key={link.label}>
-                <a
-                  href={link.href}
-                  className="block theme-muted hover:text-[color:var(--page-primary)] transition-colors py-2 cursor-pointer"
-                  onClick={(e) => handleLinkClick(e, link.href)}
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = activeSection === link.href;
+              return (
+                <li key={link.label} className="relative w-full text-center py-1">
+                  <a
+                    href={link.href}
+                    className={`block py-2 cursor-pointer transition-colors ${isActive ? "text-[color:var(--page-primary)] font-semibold" : "theme-muted hover:text-[color:var(--page-primary)]"
+                      }`}
+                    onClick={(e) => handleLinkClick(e, link.href)}
+                  >
+                    {link.label}
+                  </a>
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeUnderlineMobile"
+                      className="absolute bottom-0 left-1/4 right-1/4 h-[2px] theme-primary-bg"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                </li>
+              );
+            })}
             <li>
               <ThemeToggle theme={theme} onToggle={onToggleTheme} showLabel />
             </li>
