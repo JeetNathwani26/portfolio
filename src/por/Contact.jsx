@@ -1,6 +1,19 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Linkedin, Github, Send, CheckCircle, Phone } from "lucide-react";
+import { useState } from "react";
+import { motion } from "framer-motion";
+import {
+  Mail,
+  Linkedin,
+  Github,
+  MapPin,
+  Send,
+  CheckCircle2,
+  Loader2,
+} from "lucide-react";
+import { getEmailLink, isMobileDevice } from "./utils";
+
 
 const emailHref = "mailto:jeetnathwani660@gmail.com";
 
@@ -47,6 +60,82 @@ const InputField = ({ label, name, type = "text", value, onChange, required = tr
         />
       )}
     </div>
+/* ─── Section fade-up variant ────────────────────────────────── */
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  show: (i = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.55, delay: i * 0.1, ease: "easeOut" },
+  }),
+};
+
+/* ─── Contact Info Row ───────────────────────────────────────── */
+const InfoRow = ({ icon: Icon, label, value, href, available }) => {
+  const isMailto = href && href.startsWith("mailto:");
+  return (
+    <motion.a
+      href={href || "#"}
+      target={href ? (isMailto ? undefined : "_blank") : undefined}
+      rel={isMailto ? undefined : "noopener noreferrer"}
+      whileHover={{ x: 6, scale: 1.02 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      className="flex items-center gap-3 sm:gap-4 p-3.5 sm:p-4 rounded-2xl theme-surface border theme-border group cursor-pointer"
+      style={{ textDecoration: "none" }}
+    >
+    <div
+      className="flex items-center justify-center rounded-xl theme-primary-soft flex-shrink-0"
+      style={{ width: 44, height: 44 }}
+    >
+      <Icon size={20} className="theme-primary" />
+    </div>
+    <div className="flex-1 min-w-0">
+      <p className="text-xs theme-muted" style={{ marginBottom: 2 }}>
+        {label}
+      </p>
+      <p className="theme-text font-medium text-xs sm:text-sm break-all sm:break-normal sm:truncate">{value}</p>
+    </div>
+    {available && (
+      <span className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0" style={{ background: "rgba(16,185,129,0.15)", color: "#10b981" }}>
+        <span
+          style={{
+            width: 7,
+            height: 7,
+            borderRadius: "50%",
+            background: "#10b981",
+            display: "inline-block",
+            animation: "pulse-dot 1.8s ease-in-out infinite",
+          }}
+        />
+        Available
+      </span>
+    )}
+  </motion.a>
+  );
+};
+
+/* ─── Social Card ────────────────────────────────────────────── */
+const SocialCard = ({ icon: Icon, label, href, color }) => {
+  const isMailto = href && href.startsWith("mailto:");
+  return (
+    <motion.a
+      href={href}
+      target={isMailto ? undefined : "_blank"}
+      rel={isMailto ? undefined : "noopener noreferrer"}
+      whileHover={{ y: -6, scale: 1.04 }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ type: "spring", stiffness: 320, damping: 18 }}
+      className="flex flex-col items-center gap-2.5 sm:gap-3 p-4 sm:p-6 rounded-2xl theme-surface border theme-border cursor-pointer flex-1"
+      style={{ textDecoration: "none", minWidth: 0 }}
+    >
+    <div
+      className="flex items-center justify-center rounded-2xl"
+      style={{ width: 52, height: 52, background: color }}
+    >
+      <Icon size={24} color="#fff" />
+    </div>
+    <span className="theme-text font-semibold text-sm">{label}</span>
+  </motion.a>
   );
 };
 
@@ -67,6 +156,18 @@ const Contact = () => {
       setFormData({ name: "", email: "", subject: "", message: "" });
       setTimeout(() => setStatus("idle"), 4000);
     }, 1500);
+      const email = "jeetnathwani660@gmail.com";
+      if (isMobileDevice()) {
+        window.location.href = `mailto:${email}`;
+      } else {
+        window.open(
+          `https://mail.google.com/mail/?view=cm&fs=1&to=${email}`,
+          "_blank"
+        );
+      }
+      setFormState("sent");
+      setTimeout(() => setFormState("idle"), 3000);
+    }, 900);
   };
 
   return (

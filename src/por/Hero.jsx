@@ -3,6 +3,8 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, Github, Linkedin, Mail, Twitter } from "lucide-react";
 import photo from "../assets/hero-new.png";
 import TypingEffect from "./TypingEffect";
+import { getEmailLink } from "./utils";
+
 
 const emailHref = "mailto:jeetnathwani660@gmail.com";
 
