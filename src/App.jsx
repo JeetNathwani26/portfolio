@@ -7,8 +7,9 @@ import About from './por/About.jsx';
 import Projects from './por/Project.jsx';
 import Contact from './por/Contact.jsx';
 import Resume from './por/Resume.jsx';
+import Skills from './por/Skills.jsx';
+import Footer from './por/Footer.jsx';
 import IntroLoader from './por/IntroLoader.jsx';
-
 function App() {
   const [showIntro, setShowIntro] = useState(true);
   const [theme, setTheme] = useState(() => {
@@ -71,9 +72,11 @@ function App() {
         <div>
           <Home onViewWork={() => handleNavigate('#projects')} />
           <About />
+          <Skills />
           <Projects />
           <Resume />
           <Contact />
+          <Footer />
         </div>
       </div>
     </>

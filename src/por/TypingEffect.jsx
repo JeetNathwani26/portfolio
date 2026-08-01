@@ -3,11 +3,10 @@ import { motion } from "framer-motion";
 
 const TypingEffect = ({
   texts = [
-    "Full Stack Developer",
-    "Backend Developer",
-    "MERN Stack Developer",
-    "Laravel Developer",
-    "AI/ML Developer",
+    "Web Development",
+    "AI/ML Development",
+    "Software Development",
+    "Agent Development",
   ],
   speed = 100,       // Typing speed in ms per character
   deleteSpeed = 60,  // Deleting speed in ms per character
