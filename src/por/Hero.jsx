@@ -1,13 +1,10 @@
 import React from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, Github, Linkedin, Mail, Twitter, FileText } from "lucide-react";
+import { ArrowRight, Github, Linkedin, Mail, Twitter } from "lucide-react";
 import photo from "../assets/hero-new.png";
 import TypingEffect from "./TypingEffect";
-<<<<<<< Updated upstream
 
-const Hero = ({ onViewWork }) => {
-=======
-import { getEmailLink } from "./utils";
+const emailHref = "mailto:jeetnathwani660@gmail.com";
 
 const floatingCards = [
   { icon: "💻", title: "Backend Development", className: "top-10 left-[2%] lg:left-[0%] sm:scale-[0.82] scale-[0.58] origin-left" },
@@ -74,7 +71,6 @@ const HeroImage = () => (
     className="relative mx-auto w-full max-w-[680px] aspect-square scale-[0.72] sm:scale-[0.88] lg:scale-100 origin-center"
   >
     <GlowBackground />
-
     <div className="absolute inset-[10%] rounded-full border border-white/55 bg-white/70 backdrop-blur-[18px] shadow-[0_30px_90px_rgba(91,33,182,0.14)]" />
     <OrbitRing className="inset-[7%]" />
     <OrbitRing className="inset-[14%] opacity-50" />
@@ -123,13 +119,11 @@ const HeroImage = () => (
 );
 
 const Hero = ({ onViewWork }) => {
-  const emailHref = getEmailLink();
   const emailTarget = emailHref.startsWith("mailto:") ? undefined : "_blank";
   const emailRel = emailHref.startsWith("mailto:") ? undefined : "noopener noreferrer";
   const { scrollY } = useScroll();
   const yBg = useTransform(scrollY, [0, 1000], [0, 300]);
 
->>>>>>> Stashed changes
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-0">
       <motion.div style={{ y: yBg }} className="absolute inset-0 z-0 pointer-events-none">
@@ -154,8 +148,7 @@ const Hero = ({ onViewWork }) => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-2xl sm:text-2xl md:text-3xl lg:text-[54px] font-black tracking-tight theme-heading leading-[1.1] mb-4"
             >
-              Hi, I'm{" "}
-              <br />
+              Hi, I&apos;m <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[color:var(--page-primary)] to-[color:var(--page-accent)]">
                 Jeet Nathwani
               </span>
@@ -168,25 +161,6 @@ const Hero = ({ onViewWork }) => {
               className="text-xl sm:text-3xl md:text-4xl font-semibold theme-primary mb-5 h-10 sm:h-12"
             >
               <TypingEffect />
-<<<<<<< Updated upstream
-            </motion.h2>
-
-            <motion.p
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.5 }}
-              className="theme-muted text-lg md:text-xl max-w-xl mx-auto mb-6 hidden md:block"
-            >
-              Building secure, scalable, and high-performance web applications with Laravel, PHP, MySQL, Docker, and modern JavaScript. Focused on clean architecture, performance, and exceptional user experiences.
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.6 }}
-              className="flex justify-center md:justify-start gap-6 mb-6"
-            >
-              <a href="https://mail.google.com/mail/?view=cm&fs=1&to=jeetnathwani660@gmail.com" target="_blank" className="theme-icon transition-colors hover:scale-110" aria-label="Email"><Mail size={24} /></a>
-              <a href="https://github.com/JeetNathwani26" target="_blank" rel="noopener noreferrer" className="theme-icon transition-colors hover:scale-110" aria-label="GitHub"><Github size={24} /></a>
-              <a href="https://www.linkedin.com/in/jeet-nathwani-274a06271/" target="_blank" rel="noopener noreferrer" className="theme-icon transition-colors hover:scale-110" aria-label="LinkedIn"><Linkedin size={24} /></a>
-              <a href="https://wa.me/917567120438" target="_blank" rel="noopener noreferrer" className="theme-icon transition-colors hover:scale-110" aria-label="WhatsApp"><MessageCircle size={24} /></a>
-=======
->>>>>>> Stashed changes
             </motion.div>
 
             <motion.p

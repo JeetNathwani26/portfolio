@@ -1,6 +1,7 @@
 import React from "react";
 import { Github, Linkedin, Mail, Twitter, ArrowUp } from "lucide-react";
-import { getEmailLink } from "./utils";
+
+const emailHref = "mailto:jeetnathwani660@gmail.com";
 
 const Footer = () => {
   const scrollToTop = (e) => {
@@ -41,7 +42,7 @@ const Footer = () => {
               <a href="#" className="p-2.5 rounded-full theme-surface-strong theme-border border text-[color:var(--page-muted)] hover:text-[#1DA1F2] hover:border-[#1DA1F2] transition-colors">
                 <Twitter size={20} />
               </a>
-              <a href={getEmailLink()} className="p-2.5 rounded-full theme-surface-strong theme-border border text-[color:var(--page-muted)] hover:text-red-500 hover:border-red-500 transition-colors">
+              <a href={emailHref} className="p-2.5 rounded-full theme-surface-strong theme-border border text-[color:var(--page-muted)] hover:text-red-500 hover:border-red-500 transition-colors">
                 <Mail size={20} />
               </a>
             </div>
@@ -67,7 +68,7 @@ const Footer = () => {
             <ul className="flex flex-col gap-4 text-center md:text-left">
               <li className="text-white/80">
                 <span className="block font-medium text-white mb-1">Email</span>
-                <a href={getEmailLink()} className="text-white hover:text-[color:var(--page-primary)] transition-colors break-all">jeetnathwani660@gmail.com</a>
+                <a href={emailHref} className="text-white hover:text-[color:var(--page-primary)] transition-colors break-all">jeetnathwani660@gmail.com</a>
               </li>
               <li className="text-white/80">
                 <span className="block font-medium text-white mb-1">Location</span>
