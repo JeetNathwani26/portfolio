@@ -1,5 +1,4 @@
-@import 'tailwindcss';
-
+@import "tailwindcss";
 
 @layer utilities {
   @keyframes borderDraw {
@@ -9,7 +8,6 @@
 
     50% {
       border-color: #833305cb;
-      /* blue-500 */
     }
 
     100% {
@@ -18,8 +16,6 @@
   }
 
   @keyframes comboFillWipe {
-
-    /* Reveal from left to right */
     0% {
       clip-path: inset(0 100% 0 0);
     }
@@ -28,12 +24,10 @@
       clip-path: inset(0 0 0 0);
     }
 
-    /* Pause */
     60% {
       clip-path: inset(0 0 0 0);
     }
 
-    /* Hide from left to right */
     80% {
       clip-path: inset(0 0 0 100%);
     }
@@ -43,23 +37,36 @@
     }
   }
 
+  @keyframes lineDrift {
+    0% {
+      transform: translateX(-20%) translateY(-10%) rotate(12deg);
+      opacity: 0;
+    }
 
+    15% {
+      opacity: 0.35;
+    }
 
+    50% {
+      opacity: 0.5;
+    }
 
-
+    100% {
+      transform: translateX(20%) translateY(10%) rotate(12deg);
+      opacity: 0;
+    }
+  }
 
   .animate-border-draw {
     animation: borderDraw 3s linear infinite;
     box-shadow: 0 0 10px rgba(147, 62, 1, 0.6);
   }
 
-
-
   .animate-combo {
     animation: comboFillWipe 7s ease-in-out infinite;
   }
 
-
-
-
+  .animate-line-drift {
+    animation: lineDrift 9s linear infinite;
+  }
 }

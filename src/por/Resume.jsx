@@ -1,351 +1,162 @@
-import React, { useRef, useEffect, useState } from "react";
-import { Download, ExternalLink, GraduationCap, Briefcase, ChevronDown } from "lucide-react";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import React from "react";
+import { Download, ExternalLink, GraduationCap, Briefcase, Calendar } from "lucide-react";
+import { motion } from "framer-motion";
 
-/* ─── Timeline data ─────────────────────────────────────────── */
 const timeline = [
   {
-    year: "2021",
-    title: "Started BCA",
-    desc: "Bachelor of Computer Applications",
-    icon: <GraduationCap size={18} />,
-    color: "#818cf8",
-    side: "left",
-  },
-  {
-    year: "2024",
-    title: "Completed BCA",
-    desc: "Graduated with honours in Computer Science",
-    icon: <GraduationCap size={18} />,
-    color: "#a78bfa",
-    side: "right",
-  },
-  {
-    year: "2024",
-    title: "Started MCA",
-    desc: "Master of Computer Applications",
-    icon: <GraduationCap size={18} />,
-    color: "#818cf8",
-    side: "left",
-  },
-  {
-    year: "2026",
+    year: "2024 - Present",
     title: "Software Developer",
-    desc: "Full-Stack Developer & Open Source Contributor",
-    icon: <Briefcase size={18} />,
-    color: "#fbbf24",
-    side: "right",
+    company: "Freelance / Open Source",
+    desc: "Developing full-stack applications using React, Laravel, and Tailwind CSS. Contributing to open-source projects and building scalable APIs.",
+    tech: ["React", "Laravel", "Tailwind", "MySQL"],
+    icon: <Briefcase size={20} />,
+    type: "work",
+  },
+  {
+    year: "2024 - 2026",
+    title: "Master of Computer Applications (MCA)",
+    company: "GT University", // Replace with actual
+    desc: "Pursuing advanced studies in computer science, focusing on modern software engineering practices and architectural patterns.",
+    icon: <GraduationCap size={20} />,
+    type: "education",
+  },
+  {
+    year: "2021 - 2024",
+    title: "Bachelor of Computer Applications (BCA)",
+    company: " University", // Replace with actual
+    desc: "Graduated with honors in Computer Science. Built foundational knowledge in programming, databases, and software development lifecycles.",
+    icon: <GraduationCap size={20} />,
+    type: "education",
   },
 ];
 
-/* ─── Ripple hook ───────────────────────────────────────────── */
-function useRipple() {
-  const [ripples, setRipples] = useState([]);
-  const addRipple = (e) => {
-    const btn = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - btn.left;
-    const y = e.clientY - btn.top;
-    const id = Date.now();
-    setRipples((prev) => [...prev, { id, x, y }]);
-    setTimeout(() => setRipples((prev) => prev.filter((r) => r.id !== id)), 700);
-  };
-  return [ripples, addRipple];
-}
-
-/* ─── Main component ────────────────────────────────────────── */
-const Resume = () => {
-  const sectionRef = useRef(null);
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const glowX = useSpring(mouseX, { stiffness: 60, damping: 20 });
-  const glowY = useSpring(mouseY, { stiffness: 60, damping: 20 });
-  const [ripples, addRipple] = useRipple();
-
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-    const handleMove = (e) => {
-      const rect = section.getBoundingClientRect();
-      mouseX.set(e.clientX - rect.left);
-      mouseY.set(e.clientY - rect.top);
-    };
-    section.addEventListener("mousemove", handleMove);
-    return () => section.removeEventListener("mousemove", handleMove);
-  }, [mouseX, mouseY]);
-
+const TimelineItem = ({ item, index }) => {
+  const isWork = item.type === "work";
   return (
-    <section
-      id="resume"
-      ref={sectionRef}
-      style={{ position: "relative", overflow: "hidden", minHeight: "100vh" }}
-      className="flex items-center justify-center theme-section-alt"
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.5 }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      className="relative pl-8 md:pl-0"
     >
-      {/* ── Animated Blob Background ── */}
-      <div aria-hidden="true" style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0 }}>
-        <motion.div
-          animate={{ x: [0, 60, -30, 0], y: [0, -50, 40, 0], scale: [1, 1.15, 0.95, 1] }}
-          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-          style={{
-            position: "absolute", top: "10%", left: "8%",
-            width: 420, height: 420, borderRadius: "60% 40% 55% 45% / 50% 60% 40% 55%",
-            background: "radial-gradient(circle, rgba(129,140,248,0.22) 0%, transparent 70%)",
-            filter: "blur(55px)",
-          }}
-        />
-        <motion.div
-          animate={{ x: [0, -50, 30, 0], y: [0, 60, -40, 0], scale: [1, 0.9, 1.1, 1] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 3 }}
-          style={{
-            position: "absolute", bottom: "10%", right: "10%",
-            width: 380, height: 380, borderRadius: "45% 55% 40% 60% / 60% 40% 55% 45%",
-            background: "radial-gradient(circle, rgba(251,191,36,0.15) 0%, transparent 70%)",
-            filter: "blur(55px)",
-          }}
-        />
-        <motion.div
-          animate={{ x: [0, 40, -20, 0], y: [0, -30, 50, 0], scale: [1, 1.08, 0.93, 1] }}
-          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut", delay: 6 }}
-          style={{
-            position: "absolute", top: "50%", left: "55%",
-            width: 300, height: 300, borderRadius: "55% 45% 60% 40% / 45% 55% 45% 55%",
-            background: "radial-gradient(circle, rgba(167,139,250,0.18) 0%, transparent 70%)",
-            filter: "blur(50px)",
-          }}
-        />
-        {/* Mouse-follow glow */}
-        <motion.div
-          style={{
-            position: "absolute",
-            left: glowX,
-            top: glowY,
-            translateX: "-50%",
-            translateY: "-50%",
-            width: 340,
-            height: 340,
-            borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(129,140,248,0.13) 0%, transparent 70%)",
-            filter: "blur(40px)",
-            pointerEvents: "none",
-          }}
-        />
-        {/* Subtle grid */}
-        <div style={{
-          position: "absolute", inset: 0,
-          backgroundImage: "linear-gradient(var(--page-border) 1px, transparent 1px), linear-gradient(90deg, var(--page-border) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-          opacity: 0.35,
-        }} />
-      </div>
-
-      {/* ── Content ── */}
-      <div style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 900, margin: "0 auto", padding: "80px 24px" }}>
-
-        {/* Heading */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.2 }}
-          transition={{ duration: 0.6 }}
-          style={{ textAlign: "center", marginBottom: 12 }}
-        >
-          <span style={{
-            display: "inline-block",
-            fontSize: 12, fontWeight: 600, letterSpacing: "0.18em",
-            textTransform: "uppercase", color: "var(--page-primary)",
-            background: "color-mix(in srgb, var(--page-primary) 12%, transparent)",
-            padding: "4px 16px", borderRadius: 99,
-            marginBottom: 16,
-            border: "1px solid color-mix(in srgb, var(--page-primary) 25%, transparent)",
-          }}>
-            Career &amp; Education
+      <div className="md:grid md:grid-cols-5 md:gap-8 items-center">
+        {/* Left Side (Date & Company for Desktop) */}
+        <div className="hidden md:flex flex-col items-end col-span-2 text-right pt-1">
+          <span className="text-[color:var(--page-primary)] font-bold tracking-wider uppercase text-sm mb-1">{item.year}</span>
+          <span className="theme-muted font-medium text-sm flex items-center gap-1 justify-end">
+            <Calendar size={14} />
+            {item.company}
           </span>
-          <h2 className="theme-heading" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 800, margin: "0 0 16px", lineHeight: 1.1 }}>
-            My <span className="theme-primary">Resume</span>
+        </div>
+
+        {/* Center Node */}
+        <div className="absolute left-0 md:relative md:col-span-1 flex justify-center h-full">
+          {/* Vertical Line */}
+          <div className="absolute top-0 bottom-[-3rem] left-[15px] md:left-1/2 w-px bg-gradient-to-b from-[color:var(--page-primary)] via-[color:var(--page-border)] to-transparent -translate-x-1/2" />
+          
+          {/* Icon Node */}
+          <div className={`relative z-10 w-8 h-8 md:w-12 md:h-12 rounded-full flex items-center justify-center border-4 theme-surface-strong shadow-lg ${isWork ? 'text-[color:var(--page-accent)] border-[color:var(--page-accent)]' : 'text-[color:var(--page-primary)] border-[color:var(--page-primary)]'}`}>
+            {item.icon}
+          </div>
+        </div>
+
+        {/* Right Side (Content) */}
+        <div className="col-span-2 pb-12 pt-1 md:pt-2">
+          {/* Mobile Date & Company */}
+          <div className="md:hidden mb-2">
+            <span className="text-[color:var(--page-primary)] font-bold tracking-wider uppercase text-xs block mb-1">{item.year}</span>
+            <span className="theme-muted font-medium text-xs flex items-center gap-1">
+              <Calendar size={12} />
+              {item.company}
+            </span>
+          </div>
+
+          <h3 className="text-xl md:text-2xl font-bold theme-heading mb-3">{item.title}</h3>
+          <p className="theme-muted text-sm md:text-base leading-relaxed mb-4">{item.desc}</p>
+          
+          {item.tech && (
+            <div className="flex flex-wrap gap-2 mt-3">
+              {item.tech.map((t, i) => (
+                <span key={i} className="text-xs font-semibold theme-text bg-[color:var(--page-surface-muted)] px-3 py-1 rounded-full border theme-border">
+                  {t}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+const Resume = () => {
+  return (
+    <section id="resume" className="py-24 lg:py-32 relative theme-section-alt overflow-hidden">
+      {/* Background decorations */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[1px] bg-gradient-to-r from-transparent via-[color:var(--page-primary)]/20 to-transparent" />
+      
+      <div className="max-w-5xl mx-auto px-6 sm:px-8 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-20"
+        >
+          <span className="text-[color:var(--page-primary)] font-bold tracking-widest uppercase text-sm mb-2 block">
+            Career & Education
+          </span>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight theme-heading mb-6">
+            My <span className="text-transparent bg-clip-text bg-gradient-to-r from-[color:var(--page-primary)] to-[color:var(--page-accent)]">Experience</span>
           </h2>
         </motion.div>
 
-        {/* Professional Summary */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.2 }}
-          transition={{ duration: 0.6, delay: 0.12 }}
-          className="theme-muted"
-          style={{ textAlign: "center", maxWidth: 560, margin: "0 auto 56px", fontSize: 16, lineHeight: 1.7 }}
-        >
-          Passionate full-stack developer with expertise in modern web technologies.
-          Transforming complex problems into elegant, scalable solutions — one line of
-          code at a time.
-        </motion.p>
+        {/* Timeline */}
+        <div className="mb-24">
+          {timeline.map((item, index) => (
+            <TimelineItem key={index} item={item} index={index} />
+          ))}
+        </div>
 
-        {/* ── Timeline ── */}
+        {/* Resume Download CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.15 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          style={{ marginBottom: 64 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="relative rounded-[2rem] p-8 md:p-12 theme-surface-strong theme-border border shadow-2xl overflow-hidden text-center"
         >
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0 }}>
-            {timeline.map((item, i) => (
-              <React.Fragment key={i}>
-                <motion.div
-                  initial={{ opacity: 0, x: i % 2 === 0 ? -40 : 40 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: false, amount: 0.3 }}
-                  transition={{ duration: 0.5, delay: i * 0.12 }}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 20,
-                    width: "100%",
-                    maxWidth: 520,
-                    justifyContent: i % 2 === 0 ? "flex-start" : "flex-end",
-                  }}
-                >
-                  <div
-                    className="theme-surface theme-border"
-                    style={{
-                      display: "flex", alignItems: "center", gap: 16,
-                      padding: "14px 22px", borderRadius: 16,
-                      border: "1px solid",
-                      minWidth: 260,
-                      boxShadow: `0 4px 24px color-mix(in srgb, ${item.color} 12%, transparent)`,
-                      background: "var(--page-surface)",
-                      backdropFilter: "blur(18px)",
-                      flexDirection: i % 2 === 0 ? "row" : "row-reverse",
-                    }}
-                  >
-                    <div style={{
-                      width: 40, height: 40, borderRadius: "50%",
-                      background: `color-mix(in srgb, ${item.color} 18%, transparent)`,
-                      border: `2px solid ${item.color}`,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      color: item.color, flexShrink: 0,
-                    }}>
-                      {item.icon}
-                    </div>
-                    <div style={{ textAlign: i % 2 === 0 ? "left" : "right" }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: item.color, letterSpacing: "0.1em" }}>{item.year}</div>
-                      <div className="theme-heading" style={{ fontWeight: 700, fontSize: 15 }}>{item.title}</div>
-                      <div className="theme-muted" style={{ fontSize: 12, marginTop: 2 }}>{item.desc}</div>
-                    </div>
-                  </div>
-                </motion.div>
+          <div className="absolute inset-0 bg-gradient-to-br from-[color:var(--page-primary)]/5 to-[color:var(--page-accent)]/5 pointer-events-none" />
+          
+          <h3 className="text-2xl md:text-3xl font-bold theme-heading mb-4 relative z-10">
+            Want the full picture?
+          </h3>
+          <p className="theme-muted mb-8 max-w-md mx-auto relative z-10">
+            Download my complete resume to see a detailed overview of my skills, experiences, and educational background.
+          </p>
 
-                {i < timeline.length - 1 && (
-                  <motion.div
-                    initial={{ opacity: 0, scaleY: 0 }}
-                    whileInView={{ opacity: 1, scaleY: 1 }}
-                    viewport={{ once: false, amount: 0.3 }}
-                    transition={{ duration: 0.4, delay: i * 0.12 + 0.1 }}
-                    style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "4px 0" }}
-                  >
-                    <div style={{ width: 2, height: 24, background: "linear-gradient(180deg, var(--page-primary), transparent)", borderRadius: 2 }} />
-                    <ChevronDown size={16} style={{ color: "var(--page-primary)", opacity: 0.7 }} />
-                  </motion.div>
-                )}
-              </React.Fragment>
-            ))}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10">
+            <a
+              href="/Jeetkumar.pdf"
+              download
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-[color:var(--page-primary)] to-[color:var(--page-accent)] hover:opacity-90 transition-opacity shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:scale-105 active:scale-95"
+            >
+              <Download size={20} />
+              <span>Download Resume</span>
+            </a>
+            <a
+              href="/Jeetkumar.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold theme-text theme-surface theme-border border hover:border-[color:var(--page-primary)] transition-all hover:scale-105 active:scale-95 shadow-sm"
+            >
+              <ExternalLink size={20} />
+              <span>View Online</span>
+            </a>
           </div>
         </motion.div>
-
-        {/* ── Buttons ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.2 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          style={{ display: "flex", justifyContent: "center", gap: 20, flexWrap: "wrap" }}
-        >
-          {/* Primary — Download Resume */}
-          <a
-            href="/Jeetkumar.pdf"
-            download
-            onClick={addRipple}
-            style={{
-              position: "relative", overflow: "hidden",
-              display: "inline-flex", alignItems: "center", gap: 10,
-              padding: "14px 32px", borderRadius: 14,
-              fontWeight: 700, fontSize: 15, color: "#fff",
-              background: "var(--page-primary)",
-              textDecoration: "none",
-              cursor: "pointer",
-            }}
-            onMouseEnter={e => {
-              const icon = e.currentTarget.querySelector(".resume-dl-icon");
-              if (icon) icon.style.transform = "translateY(3px)";
-            }}
-            onMouseLeave={e => {
-              const icon = e.currentTarget.querySelector(".resume-dl-icon");
-              if (icon) icon.style.transform = "translateY(0)";
-            }}
-          >
-            {ripples.map(r => (
-              <span key={r.id} style={{
-                position: "absolute",
-                left: r.x, top: r.y,
-                width: 8, height: 8,
-                marginLeft: -4, marginTop: -4,
-                borderRadius: "50%",
-                background: "rgba(255,255,255,0.5)",
-                animation: "resumeRipple 0.7s ease-out forwards",
-                pointerEvents: "none",
-              }} />
-            ))}
-            <Download
-              size={20}
-              className="resume-dl-icon"
-              style={{ transition: "transform 0.25s ease" }}
-            />
-            Download Resume
-          </a>
-
-          {/* Secondary — View Resume */}
-          <a
-            href="/Jeetkumar.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              position: "relative", overflow: "hidden",
-              display: "inline-flex", alignItems: "center", gap: 10,
-              padding: "14px 32px", borderRadius: 14,
-              fontWeight: 700, fontSize: 15,
-              color: "var(--page-primary)",
-              background: "color-mix(in srgb, var(--page-primary) 8%, transparent)",
-              border: "1.5px solid color-mix(in srgb, var(--page-primary) 35%, transparent)",
-              backdropFilter: "blur(16px)",
-              textDecoration: "none",
-              transition: "box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease",
-              cursor: "pointer",
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.boxShadow = "0 0 0 3px color-mix(in srgb, var(--page-primary) 20%, transparent), 0 8px 32px color-mix(in srgb, var(--page-primary) 18%, transparent)";
-              e.currentTarget.style.borderColor = "var(--page-primary)";
-              e.currentTarget.style.background = "color-mix(in srgb, var(--page-primary) 14%, transparent)";
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.boxShadow = "none";
-              e.currentTarget.style.borderColor = "color-mix(in srgb, var(--page-primary) 35%, transparent)";
-              e.currentTarget.style.background = "color-mix(in srgb, var(--page-primary) 8%, transparent)";
-            }}
-          >
-            <ExternalLink size={20} />
-            View Resume
-          </a>
-        </motion.div>
       </div>
-
-      {/* Keyframe styles */}
-      <style>{`
-        @keyframes resumeGlow {
-          0%, 100% { box-shadow: 0 0 18px 2px color-mix(in srgb, var(--page-primary) 38%, transparent), 0 4px 24px color-mix(in srgb, var(--page-primary) 20%, transparent); }
-          50%       { box-shadow: 0 0 32px 6px color-mix(in srgb, var(--page-primary) 55%, transparent), 0 8px 36px color-mix(in srgb, var(--page-primary) 30%, transparent); }
-        }
-        @keyframes resumeRipple {
-          to { transform: scale(28); opacity: 0; }
-        }
-      `}</style>
     </section>
   );
 };

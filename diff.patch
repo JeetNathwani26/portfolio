@@ -1,0 +1,366 @@
+﻿diff --git a/src/por/Resume.jsx b/src/por/Resume.jsx
+index 193578f..29bc76a 100644
+--- a/src/por/Resume.jsx
++++ b/src/por/Resume.jsx
+@@ -1,38 +1,332 @@
+-import React from "react";
+-import { Download } from "lucide-react";
+-import { motion } from "framer-motion";
++import React, { useEffect, useRef, useState } from "react";
++import { Download, Eye, Briefcase, Code2, GraduationCap, FolderOpen, Award } from "lucide-react";
++import { motion, useInView } from "framer-motion";
++
++// ΓöÇΓöÇΓöÇ Data ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
++
++const resumeDetails = [
++  { icon: Briefcase,     label: "Experience",      desc: "Full-stack web development" },
++  { icon: Code2,         label: "Skills",           desc: "React, Laravel, Node.js, PHP" },
++  { icon: GraduationCap, label: "Education",        desc: "BCA ┬╖ MCA (in progress)" },
++  { icon: FolderOpen,    label: "Projects",         desc: "Real-world client projects" },
++  { icon: Award,         label: "Certifications",   desc: "Industry-recognised certs" },
++];
++
++const timeline = [
++  { year: "2021", title: "Started BCA",        subtitle: "Bachelor of Computer Applications" },
++  { year: "2024", title: "Completed BCA",      subtitle: "Graduated with distinction" },
++  { year: "2024", title: "Started MCA",        subtitle: "Master of Computer Applications" },
++  { year: "2026", title: "Software Developer", subtitle: "Full-stack & AI enthusiast" },
++];
++
++// ΓöÇΓöÇΓöÇ Floating blob component ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
++
++const Blob = ({ style, animate }) => (
++  <motion.div
++    aria-hidden="true"
++    className="absolute rounded-full pointer-events-none"
++    style={{
++      background:
++        "radial-gradient(circle, color-mix(in srgb, var(--page-primary) 35%, transparent), transparent 70%)",
++      filter: "blur(60px)",
++      ...style,
++    }}
++    animate={animate}
++    transition={{ duration: animate.duration ?? 8, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
++  />
++);
++
++// ΓöÇΓöÇΓöÇ Resume skeleton preview ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
++
++const SkeletonLine = ({ w = "100%", h = 8, mb = 6, opacity = 1 }) => (
++  <div
++    style={{
++      width: w,
++      height: h,
++      marginBottom: mb,
++      borderRadius: 4,
++      background: "color-mix(in srgb, var(--page-primary) 18%, transparent)",
++      opacity,
++    }}
++  />
++);
++
++
++
++// ΓöÇΓöÇΓöÇ Main component ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+ 
+ const Resume = () => {
++  const sectionRef = useRef(null);
++  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
++
++  // Mouse-follow glow
++  useEffect(() => {
++    const section = sectionRef.current;
++    if (!section) return;
++    const handleMove = (e) => {
++      const rect = section.getBoundingClientRect();
++      setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
++    };
++    section.addEventListener("mousemove", handleMove);
++    return () => section.removeEventListener("mousemove", handleMove);
++  }, []);
++
+   return (
+     <section
+       id="resume"
+-      className="min-h-screen flex items-center justify-center theme-section-alt"
++      ref={sectionRef}
++      className="relative min-h-screen py-24 px-6 overflow-hidden theme-section-alt"
+     >
+-      <div className="text-center px-6">
+-        <motion.h2 
+-          initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, amount: 0.2 }}
+-          className="text-3xl md:text-5xl font-bold theme-heading mb-6"
+-        >
+-          My <span className="theme-primary">Resume</span>
+-        </motion.h2>
+-
+-        <motion.p 
+-          initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, amount: 0.2 }} transition={{ delay: 0.1 }}
+-          className="theme-muted max-w-xl mx-auto mb-8"
+-        >
+-          Download my resume to learn more about my skills, projects, and
+-          experience.
+-        </motion.p>
+-
+-        <motion.a
+-          initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: false, amount: 0.2 }} transition={{ delay: 0.2 }}
+-          href="/public/Jeetkumar.pdf"
+-          download
+-          className="inline-flex items-center gap-3 theme-primary-bg text-white px-8 py-3 rounded-lg font-medium transition-transform hover:scale-105 shadow-md"
+-        >
+-          <Download size={20} />
+-          Download Resume
+-        </motion.a>
++      {/* ΓöÇΓöÇ Animated background blobs ΓöÇΓöÇ */}
++      <Blob style={{ width: 420, height: 420, top: "-10%", left: "-8%", opacity: 0.45 }} animate={{ y: [0, -40, 0], x: [0, 20, 0], duration: 9 }} />
++      <Blob style={{ width: 320, height: 320, bottom: "5%", right: "-5%", opacity: 0.35 }} animate={{ y: [0, 30, 0], x: [0, -15, 0], duration: 11 }} />
++      <Blob style={{ width: 200, height: 200, top: "50%", left: "55%", opacity: 0.25 }} animate={{ y: [0, -20, 0], duration: 7 }} />
++
++      {/* ΓöÇΓöÇ Mouse glow ΓöÇΓöÇ */}
++      <div
++        aria-hidden="true"
++        className="pointer-events-none absolute inset-0"
++        style={{
++          background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, color-mix(in srgb, var(--page-primary) 8%, transparent), transparent 60%)`,
++          transition: "background 0.1s ease",
++        }}
++      />
++
++      {/* ΓöÇΓöÇ Content ΓöÇΓöÇ */}
++      <div className="relative z-10 max-w-6xl mx-auto">
++
++        {/* Heading */}
++        <div className="text-center mb-16">
++          <motion.div
++            initial={{ opacity: 0, y: -10 }}
++            whileInView={{ opacity: 1, y: 0 }}
++            viewport={{ once: false, amount: 0.3 }}
++            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase mb-6 theme-primary-soft border"
++            style={{ borderColor: "color-mix(in srgb, var(--page-primary) 30%, transparent)" }}
++          >
++            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--page-primary)", display: "inline-block" }} />
++            Professional Profile
++          </motion.div>
++
++          <motion.h2
++            initial={{ opacity: 0, y: 20 }}
++            whileInView={{ opacity: 1, y: 0 }}
++            viewport={{ once: false, amount: 0.3 }}
++            transition={{ delay: 0.1 }}
++            className="text-4xl md:text-6xl font-bold theme-heading mb-4"
++          >
++            My{" "}
++            <span
++              className="theme-primary"
++              style={{
++                background: "linear-gradient(135deg, var(--page-primary), var(--page-accent))",
++                WebkitBackgroundClip: "text",
++                WebkitTextFillColor: "transparent",
++                backgroundClip: "text",
++              }}
++            >
++              Resume
++            </span>
++          </motion.h2>
++
++          <motion.p
++            initial={{ opacity: 0, y: 20 }}
++            whileInView={{ opacity: 1, y: 0 }}
++            viewport={{ once: false, amount: 0.3 }}
++            transition={{ delay: 0.2 }}
++            className="theme-muted max-w-xl mx-auto text-base md:text-lg"
++          >
++            A full-stack developer with a passion for clean architecture, elegant
++            UIs, and real-world problem solving.
++          </motion.p>
++        </div>
++
++        {/* ΓöÇΓöÇ 2-column body ΓöÇΓöÇ */}
++        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start mb-16">
++
++          {/* LEFT ΓÇö Preview card */}
++          <div className="flex justify-center lg:justify-end">
++            <ResumePreviewCard />
++          </div>
++
++          {/* RIGHT ΓÇö Details + Timeline */}
++          <div className="flex flex-col gap-10">
++
++            {/* Details checklist */}
++            <div>
++              <motion.p
++                initial={{ opacity: 0, y: 10 }}
++                whileInView={{ opacity: 1, y: 0 }}
++                viewport={{ once: false, amount: 0.3 }}
++                className="text-xs font-bold tracking-widest uppercase theme-muted mb-5"
++              >
++                What's inside
++              </motion.p>
++              <div className="flex flex-col gap-3">
++                {resumeDetails.map(({ icon: Icon, label, desc }, i) => (
++                  <motion.div
++                    key={label}
++                    initial={{ opacity: 0, x: 30 }}
++                    whileInView={{ opacity: 1, x: 0 }}
++                    viewport={{ once: false, amount: 0.3 }}
++                    transition={{ delay: i * 0.1, duration: 0.45, ease: "easeOut" }}
++                    className="flex items-center gap-4 p-3 rounded-xl theme-surface border"
++                    style={{ borderColor: "color-mix(in srgb, var(--page-primary) 15%, transparent)" }}
++                  >
++                    <div
++                      className="flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center theme-primary-soft"
++                    >
++                      <Icon size={16} />
++                    </div>
++                    <div>
++                      <div className="font-semibold text-sm theme-heading">{label}</div>
++                      <div className="text-xs theme-muted">{desc}</div>
++                    </div>
++                    {/* check dot */}
++                    <div className="ml-auto w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "color-mix(in srgb, var(--page-primary) 20%, transparent)" }}>
++                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
++                        <path d="M1.5 5L4 7.5L8.5 2.5" stroke="var(--page-primary)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
++                      </svg>
++                    </div>
++                  </motion.div>
++                ))}
++              </div>
++            </div>
++
++            {/* Timeline */}
++            <div>
++              <motion.p
++                initial={{ opacity: 0, y: 10 }}
++                whileInView={{ opacity: 1, y: 0 }}
++                viewport={{ once: false, amount: 0.3 }}
++                className="text-xs font-bold tracking-widest uppercase theme-muted mb-5"
++              >
++                Journey
++              </motion.p>
++              <div className="relative pl-6">
++                {/* Vertical line */}
++                <div
++                  className="absolute left-2 top-2 bottom-2"
++                  style={{ width: 2, background: "color-mix(in srgb, var(--page-primary) 25%, transparent)", borderRadius: 2 }}
++                />
++
++                {timeline.map(({ year, title, subtitle }, i) => {
++                  const isLast = i === timeline.length - 1;
++                  return (
++                    <motion.div
++                      key={`${year}-${title}`}
++                      initial={{ opacity: 0, x: 20 }}
++                      whileInView={{ opacity: 1, x: 0 }}
++                      viewport={{ once: false, amount: 0.3 }}
++                      transition={{ delay: i * 0.15, duration: 0.45, ease: "easeOut" }}
++                      className="relative mb-6 last:mb-0"
++                    >
++                      {/* Dot */}
++                      <div
++                        className="absolute -left-6 top-1 w-4 h-4 rounded-full border-2 flex items-center justify-center"
++                        style={{
++                          borderColor: isLast ? "var(--page-primary)" : "color-mix(in srgb, var(--page-primary) 50%, transparent)",
++                          background: isLast ? "var(--page-primary)" : "var(--page-surface)",
++                          boxShadow: isLast ? "0 0 10px color-mix(in srgb, var(--page-primary) 60%, transparent)" : "none",
++                          transform: "translateX(3px)",
++                        }}
++                      >
++                        {isLast && <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#fff" }} />}
++                      </div>
++
++                      <div>
++                        <span
++                          className="text-xs font-bold tracking-widest"
++                          style={{ color: isLast ? "var(--page-primary)" : "var(--page-muted)" }}
++                        >
++                          {year}
++                        </span>
++                        <div className="font-semibold text-sm theme-heading mt-0.5">{title}</div>
++                        <div className="text-xs theme-muted">{subtitle}</div>
++                      </div>
++                    </motion.div>
++                  );
++                })}
++              </div>
++            </div>
++          </div>
++        </div>
++
++        {/* ΓöÇΓöÇ Buttons ΓöÇΓöÇ */}
++        <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
++
++          {/* Primary ΓÇö View Resume */}
++          <motion.a
++            initial={{ opacity: 0, scale: 0.9 }}
++            whileInView={{ opacity: 1, scale: 1 }}
++            viewport={{ once: false, amount: 0.3 }}
++            transition={{ delay: 0.2 }}
++            whileHover={{ scale: 1.06 }}
++            whileTap={{ scale: 0.97 }}
++            href="/Jeetkumar.pdf"
++            target="_blank"
++            rel="noopener noreferrer"
++            className="relative overflow-hidden inline-flex items-center gap-3 px-8 py-3.5 rounded-xl font-semibold text-white shadow-lg cursor-pointer select-none"
++            style={{
++              background: "linear-gradient(135deg, var(--page-primary) 0%, var(--page-primary-hover) 100%)",
++              boxShadow: "0 8px 24px -6px color-mix(in srgb, var(--page-primary) 55%, transparent)",
++            }}
++          >
++            {/* Shimmer */}
++            <motion.span
++              aria-hidden
++              className="absolute inset-0 pointer-events-none"
++              style={{
++                background: "linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.22) 50%, transparent 70%)",
++                backgroundSize: "200% 100%",
++              }}
++              animate={{ backgroundPositionX: ["200%", "-200%"] }}
++              transition={{ duration: 2.2, repeat: Infinity, ease: "linear" }}
++            />
++            <motion.span whileHover={{ scale: 1.25 }} transition={{ type: "spring", stiffness: 400 }}>
++              <Eye size={19} />
++            </motion.span>
++            View Resume
++          </motion.a>
++
++          {/* Secondary ΓÇö Download Resume */}
++          <motion.a
++            initial={{ opacity: 0, scale: 0.9 }}
++            whileInView={{ opacity: 1, scale: 1 }}
++            viewport={{ once: false, amount: 0.3 }}
++            transition={{ delay: 0.3 }}
++            whileHover={{ scale: 1.06 }}
++            whileTap={{ scale: 0.97 }}
++            href="/Jeetkumar.pdf"
++            download
++            className="group relative inline-flex items-center gap-3 px-8 py-3.5 rounded-xl font-semibold cursor-pointer select-none border theme-muted"
++            style={{
++              backdropFilter: "blur(14px)",
++              background: "color-mix(in srgb, var(--page-primary) 8%, transparent)",
++              borderColor: "color-mix(in srgb, var(--page-primary) 30%, transparent)",
++              transition: "border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease",
++            }}
++            onMouseEnter={(e) => {
++              e.currentTarget.style.borderColor = "var(--page-primary)";
++              e.currentTarget.style.color = "var(--page-primary)";
++              e.currentTarget.style.boxShadow = "0 6px 20px -6px color-mix(in srgb, var(--page-primary) 35%, transparent)";
++            }}
++            onMouseLeave={(e) => {
++              e.currentTarget.style.borderColor = "color-mix(in srgb, var(--page-primary) 30%, transparent)";
++              e.currentTarget.style.color = "";
++              e.currentTarget.style.boxShadow = "none";
++            }}
++          >
++            <motion.span
++              animate={{ y: [0, -3, 0] }}
++              transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
++            >
++              <Download size={19} />
++            </motion.span>
++            Download Resume
++          </motion.a>
++        </div>
++
+       </div>
+     </section>
+   );
