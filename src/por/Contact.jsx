@@ -110,25 +110,25 @@ const Contact = () => {
               </p>
 
               <div className="flex flex-col gap-6 mb-10">
-                <a href={emailHref} className="flex items-center gap-4 group">
-                  <div className="w-12 h-12 rounded-full theme-surface theme-border border flex items-center justify-center text-[color:var(--page-primary)] group-hover:bg-[color:var(--page-primary)] group-hover:text-white transition-all shadow-sm">
+                <a href={emailHref} className="flex items-center gap-3 sm:gap-4">
+                  <div className="w-14 h-14 sm:w-12 sm:h-12 rounded-full theme-surface theme-border border flex items-center justify-center text-[color:var(--page-primary)] transition-all shadow-sm flex-shrink-0">
                     <Mail size={20} />
                   </div>
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm theme-muted font-medium">Email Me</p>
-                    <p className="font-semibold theme-text group-hover:text-[color:var(--page-primary)] transition-colors">
+                    <p className="font-semibold theme-text break-all sm:break-normal sm:whitespace-normal">
                       jeetnathwani660@gmail.com
                     </p>
                   </div>
                 </a>
 
-                <a href="https://wa.me/917567120438" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group">
-                  <div className="w-12 h-12 rounded-full theme-surface theme-border border flex items-center justify-center text-[color:var(--page-accent)] group-hover:bg-[color:var(--page-accent)] group-hover:text-white transition-all shadow-sm">
+                <a href="https://wa.me/917567120438" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 sm:gap-4">
+                  <div className="w-14 h-14 sm:w-12 sm:h-12 rounded-full theme-surface theme-border border flex items-center justify-center text-[color:var(--page-accent)] transition-all shadow-sm flex-shrink-0">
                     <Phone size={20} />
                   </div>
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm theme-muted font-medium">Call / WhatsApp</p>
-                    <p className="font-semibold theme-text group-hover:text-[color:var(--page-accent)] transition-colors">
+                    <p className="font-semibold theme-text break-words sm:break-normal sm:whitespace-normal">
                       +91 75671 20438
                     </p>
                   </div>

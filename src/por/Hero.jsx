@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, Github, Linkedin, Mail, Twitter } from "lucide-react";
+import { ArrowRight, Bot, Cloud, Cpu, Github, Layers3, Linkedin, Mail, MessageCircle, Server, Workflow } from "lucide-react";
 import photo from "../assets/hero-new.png";
 import TypingEffect from "./TypingEffect";
 import { getEmailLink } from "./utils";
@@ -9,12 +9,15 @@ import { getEmailLink } from "./utils";
 const emailHref = "mailto:jeetnathwani660@gmail.com";
 
 const floatingCards = [
-  { icon: "💻", title: "Backend Development", className: "top-10 left-[2%] lg:left-[0%] sm:scale-[0.82] scale-[0.58] origin-left" },
-  { icon: "🤖", title: "AI Development", className: "top-12 right-[2%] lg:right-[0%] sm:scale-[0.82] scale-[0.58] origin-right" },
-  { icon: "⚙", title: "Laravel Expert", className: "top-[44%] left-[5%] lg:left-[2%] sm:scale-[0.82] scale-[0.58] origin-left" },
-  { icon: "🚀", title: "API Integration", className: "bottom-[24%] left-[2%] lg:left-[0%] sm:scale-[0.82] scale-[0.58] origin-left" },
-  { icon: "☁", title: "Cloud Deployment", className: "bottom-8 right-[2%] lg:right-[0%] sm:scale-[0.82] scale-[0.58] origin-right" },
+  { icon: <Server size={14} />, title: "Backend Development", className: "top-[-2%] left-[-10%] sm:top-[1%] sm:left-[-15%] lg:top-[1%] lg:left-[-15%] origin-left" },
+  { icon: <Bot size={14} />, title: "AI Development", className: "top-[10%] right-[-10%] sm:right-[-15%] lg:right-[-15%] origin-right" },
+  { icon: <Layers3 size={14} />, title: "Laravel Expert", className: "top-[50%] right-[-15%] sm:right-[-15%] lg:right-[-15%] origin-right" },
+  { icon: <Workflow size={14} />, title: "API Integration", className: "bottom-[-1%] left-[-10%] sm:bottom-[10%] sm:left-[-15%] lg:left-[-15%] origin-left" },
+  { icon: <Cloud size={14} />, title: "Cloud Deployment", className: "bottom-[-7%] right-[-10%] sm:bottom-[25%] sm:right-[-15%] lg:bottom-[10%] lg:right-[-15%] origin-right" },
 ];
+
+const floatingCardsBeforeImage = floatingCards.slice(0, 2);
+const floatingCardsAfterImage = floatingCards.slice(2);
 
 const OrbitRing = ({ className }) => (
   <motion.div
@@ -45,24 +48,40 @@ const GlowBackground = () => (
   </div>
 );
 
-const FloatingCard = ({ icon, title, className, delay }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 14, scale: 0.96 }}
-    animate={{ opacity: 1, y: [0, -10, 0], scale: 1 }}
-    transition={{
-      opacity: { duration: 0.5, delay },
-      scale: { duration: 0.5, delay },
-      y: { duration: 5.5, repeat: Infinity, ease: "easeInOut", delay },
-    }}
-    whileHover={{ y: -4, scale: 1.01 }}
-    className={`absolute z-30 flex items-center gap-1.5 rounded-2xl border border-white/50 bg-white/75 px-2 py-1.5 sm:px-3 sm:py-2 shadow-[0_14px_40px_rgba(76,29,149,0.12)] backdrop-blur-[18px] ${className}`}
-  >
-    <span className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-[linear-gradient(135deg,rgba(99,102,241,0.18),rgba(168,85,247,0.24))] text-xs sm:text-sm">
-      {icon}
-    </span>
-    <span className="whitespace-nowrap text-[9px] sm:text-[12px] font-semibold text-slate-800">{title}</span>
-  </motion.div>
-);
+const FloatingCard = ({ icon, title, className, delay }) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  const mobileAnimate = { opacity: 1, y: [0, -6, 0], scale: [0.98, 1.02, 0.98] };
+  const desktopAnimate = { opacity: 1, y: [0, -10, 0], scale: 1 };
+
+  const transition = {
+    opacity: { duration: 0.45, delay },
+    scale: { duration: 0.45, delay },
+    y: { duration: isMobile ? 3.5 : 5.5, repeat: Infinity, ease: "easeInOut", delay },
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 14, scale: 0.98 }}
+      animate={isMobile ? mobileAnimate : desktopAnimate}
+      transition={transition}
+      whileHover={{ y: -4, scale: 1.01 }}
+      className={`absolute flex items-center gap-2 rounded-2xl border border-white/50 bg-white/78 px-2.5 py-2 shadow-[0_14px_40px_rgba(76,29,149,0.12)] backdrop-blur-[18px] ${className}`}
+    >
+      <span className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-[linear-gradient(135deg,rgba(99,102,241,0.18),rgba(168,85,247,0.24))] text-sm">
+        {icon}
+      </span>
+      <span className="whitespace-nowrap text-[13px] sm:text-[12px] font-semibold text-slate-800">{title}</span>
+    </motion.div>
+  );
+};
 
 const HeroImage = () => (
   <motion.div
@@ -70,51 +89,45 @@ const HeroImage = () => (
     animate={{ opacity: 1, scale: 1 }}
     transition={{ duration: 0.8, ease: "easeOut" }}
     whileHover={{ y: -4 }}
-    className="relative mx-auto w-full max-w-[680px] aspect-square scale-[0.72] sm:scale-[0.88] lg:scale-100 origin-center"
+    className="relative mx-auto w-full max-w-[680px] aspect-square scale-[0.82] sm:scale-[0.8] lg:scale-100 origin-center pt-16 sm:pt-0 translate-y-6 sm:translate-y-8 lg:translate-y-0"
   >
     <GlowBackground />
-    <div className="absolute inset-[10%] rounded-full border border-white/55 bg-white/70 backdrop-blur-[18px] shadow-[0_30px_90px_rgba(91,33,182,0.14)]" />
-    <OrbitRing className="inset-[7%]" />
-    <OrbitRing className="inset-[14%] opacity-50" />
-    <div className="absolute inset-[20%] rounded-full border border-dashed border-[rgba(124,58,237,0.16)] opacity-80" />
+    <div className="absolute inset-0 z-10">
+      <div className="absolute inset-[10%] rounded-full border border-white/55 bg-white/70 backdrop-blur-[18px] shadow-[0_30px_90px_rgba(91,33,182,0.14)]" />
+      <OrbitRing className="inset-[7%]" />
+      <OrbitRing className="inset-[14%] opacity-50" />
+      <div className="absolute inset-[20%] rounded-full border border-dashed border-[rgba(124,58,237,0.16)] opacity-80" />
 
-    <motion.div
-      className="absolute inset-[16%] rounded-full bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.95)_0%,rgba(255,255,255,0.82)_36%,rgba(235,231,255,0.7)_68%,rgba(255,255,255,0.2)_100%)] shadow-[0_24px_80px_rgba(99,102,241,0.18)]"
-      animate={{
-        boxShadow: [
-          "0 24px 80px rgba(99,102,241,0.16)",
-          "0 30px 100px rgba(168,85,247,0.22)",
-          "0 24px 80px rgba(99,102,241,0.16)",
-        ],
-      }}
-      transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-    />
-
-    <motion.div
-      className="absolute inset-[24%] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.92)_0%,rgba(255,255,255,0.48)_42%,rgba(255,255,255,0)_72%)]"
-      animate={{ scale: [1, 1.03, 1], opacity: [0.7, 0.95, 0.7] }}
-      transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-    />
+      {floatingCardsBeforeImage.map((card, index) => (
+        <FloatingCard
+          key={card.title}
+          icon={card.icon}
+          title={card.title}
+          className={`${card.className} z-10`}
+          delay={0.15 * index}
+        />
+      ))}
+    </div>
 
     <div className="absolute left-1/2 bottom-[-10%] z-20 w-[78%] max-w-[350px] -translate-x-1/2 overflow-visible sm:w-[74%]">
       <motion.img
         src={photo}
         alt="Jeet Nathwani"
-        className="h-auto w-full object-contain object-bottom translate-y-[7%] drop-shadow-[0_22px_30px_rgba(79,70,229,0.18)]"
+        className="relative z-20 h-auto w-full object-contain object-bottom translate-y-[7%] drop-shadow-[0_22px_30px_rgba(79,70,229,0.18)]"
         animate={{ y: [0, -4, 0] }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       />
     </div>
 
-    <div className="absolute inset-[16%] rounded-full bg-[radial-gradient(circle_at_center,rgba(168,85,247,0.12)_0%,rgba(99,102,241,0.07)_34%,rgba(255,255,255,0)_72%)]" />
+    <div className="absolute inset-[16%] z-30 rounded-full bg-[radial-gradient(circle_at_center,rgba(168,85,247,0.12)_0%,rgba(99,102,241,0.07)_34%,rgba(255,255,255,0)_72%)]" />
 
-    {floatingCards.map((card, index) => (
+    {floatingCardsAfterImage.map((card, index) => (
       <FloatingCard
         key={card.title}
         icon={card.icon}
         title={card.title}
-        className={card.className}
-        delay={0.15 * index}
+        className={`${card.className} z-40`}
+        delay={0.15 * (index + floatingCardsBeforeImage.length)}
       />
     ))}
   </motion.div>
@@ -141,14 +154,14 @@ const Hero = ({ onViewWork }) => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--page-muted)_1px,transparent_1px)] bg-[size:48px_48px] opacity-[0.03] dark:opacity-[0.06]" />
       </motion.div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-20 sm:mt-10 lg:pt-12 w-full relative z-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-20 sm:mt-10 lg:pt-12 w-full relative z-10">
         <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-8 items-center min-h-[calc(100vh-100px)]">
           <div className="order-2 lg:order-none lg:col-span-7 flex flex-col justify-center text-center lg:text-left z-20 mt-4 lg:mt-0">
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-2xl sm:text-2xl md:text-3xl lg:text-[54px] font-black tracking-tight theme-heading leading-[1.1] mb-4"
+              className="text-3xl sm:text-2xl md:text-3xl lg:text-[54px] font-black tracking-tight theme-heading leading-[1.1] mb-4"
             >
               Hi, I&apos;m <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[color:var(--page-primary)] to-[color:var(--page-accent)]">
@@ -160,7 +173,7 @@ const Hero = ({ onViewWork }) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-xl sm:text-3xl md:text-4xl font-semibold theme-primary mb-5 h-10 sm:h-12"
+              className="text-2xl sm:text-3xl md:text-4xl font-semibold theme-primary mb-5 h-10 sm:h-12"
             >
               <TypingEffect />
             </motion.div>
@@ -209,7 +222,7 @@ const Hero = ({ onViewWork }) => {
               {[
                 { icon: <Github size={22} />, href: "https://github.com/JeetNathwani26" },
                 { icon: <Linkedin size={22} />, href: "https://www.linkedin.com/in/jeet-nathwani-274a06271/" },
-                { icon: <Twitter size={22} />, href: "#" },
+                { icon: <MessageCircle size={22} />, href: "https://wa.me/917567120438" },
                 { icon: <Mail size={22} />, href: emailHref, target: emailTarget, rel: emailRel },
               ].map((social, idx) => (
                 <motion.a
@@ -237,3 +250,5 @@ const Hero = ({ onViewWork }) => {
 };
 
 export default Hero;
+
+
