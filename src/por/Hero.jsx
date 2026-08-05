@@ -9,9 +9,9 @@ import { getEmailLink } from "./utils";
 const emailHref = "mailto:jeetnathwani660@gmail.com";
 
 const floatingCards = [
-  { icon: <Server size={14} />, title: "Backend Development", className: "top-[-2%] left-[-10%] sm:top-[1%] sm:left-[-15%] lg:top-[1%] lg:left-[-15%] origin-left" },
-  { icon: <Bot size={14} />, title: "AI Development", className: "top-[10%] right-[-10%] sm:right-[-15%] lg:right-[-15%] origin-right" },
-  { icon: <Layers3 size={14} />, title: "Laravel Expert", className: "top-[50%] right-[-15%] sm:right-[-15%] lg:right-[-15%] origin-right" },
+  { icon: <Server size={14} />, title: "Full Stack Development", className: "top-[-2%] left-[-10%] sm:top-[1%] sm:left-[-15%] lg:top-[1%] lg:left-[-15%] origin-left" },
+  { icon: <Bot size={14} />, title: "Agent Development", className: "top-[10%] right-[-10%] sm:right-[-15%] lg:right-[-15%] origin-right" },
+  { icon: <Layers3 size={14} />, title: "AI Development", className: "top-[50%] right-[-15%] sm:right-[-15%] lg:right-[-15%] origin-right" },
   { icon: <Workflow size={14} />, title: "API Integration", className: "bottom-[-1%] left-[-10%] sm:bottom-[10%] sm:left-[-15%] lg:left-[-15%] origin-left" },
   { icon: <Cloud size={14} />, title: "Cloud Deployment", className: "bottom-[-7%] right-[-10%] sm:bottom-[25%] sm:right-[-15%] lg:bottom-[10%] lg:right-[-15%] origin-right" },
 ];

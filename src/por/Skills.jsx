@@ -19,13 +19,13 @@ const skillCategories = [
     title: "Database",
     icon: <Database size={24} />,
     color: "from-emerald-500 to-teal-500",
-    skills: ["MySQL", "PostgreSQL", "MongoDB", "Redis"],
+    skills: ["MySQL", "MongoDB", "Redis"],
   },
   {
     title: "DevOps",
     icon: <Terminal size={24} />,
     color: "from-orange-500 to-amber-500",
-    skills: ["Docker", "GitHub Actions", "AWS", "Linux"],
+    skills: ["Docker", "GitHub Actions", "Linux"],
   },
 ];
 
