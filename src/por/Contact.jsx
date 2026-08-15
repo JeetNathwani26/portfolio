@@ -58,16 +58,6 @@ const Contact = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setStatus("submitting");
-
-    setTimeout(() => {
-      setStatus("success");
-      setFormData({ name: "", email: "", subject: "", message: "" });
-      setTimeout(() => setStatus("idle"), 4000);
-    }, 1500);
-  };
 
   return (
     <section id="contact" className="py-24 lg:py-32 relative theme-page overflow-hidden">
@@ -157,45 +147,19 @@ const Contact = () => {
             className="lg:col-span-3"
           >
             <div className="theme-surface-strong theme-border border rounded-3xl p-8 sm:p-12 shadow-2xl backdrop-blur-xl relative overflow-hidden">
-              <h3 className="text-3xl font-bold theme-heading mb-8">Send a Message</h3>
+              <h3 className="text-3xl text-center font-bold theme-heading mb-8">Send a Message</h3>
 
-              <form onSubmit={handleSubmit} className="relative z-10">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-                  <InputField label="Your Name" name="name" value={formData.name} onChange={handleChange} />
-                  <InputField label="Your Email" name="email" type="email" value={formData.email} onChange={handleChange} />
-                </div>
-                <InputField label="Subject" name="subject" value={formData.subject} onChange={handleChange} />
-                <InputField label="Message" name="message" type="textarea" value={formData.message} onChange={handleChange} />
-
+              <a href="https://wa.me/917567120438" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 sm:gap-4 mb-6">
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   disabled={status === "submitting" || status === "success"}
                   className="w-full py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-[color:var(--page-primary)] to-[color:var(--page-accent)] shadow-[0_10px_30px_-10px_rgba(79,70,229,0.5)] flex items-center justify-center gap-3 overflow-hidden relative"
                 >
-                  <AnimatePresence mode="wait">
-                    {status === "idle" && (
-                      <motion.div key="idle" initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }} className="flex items-center gap-2">
-                        <span>Send Message</span>
-                        <Send size={18} />
-                      </motion.div>
-                    )}
-                    {status === "submitting" && (
-                      <motion.div key="submitting" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center gap-2">
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        <span>Sending...</span>
-                      </motion.div>
-                    )}
-                    {status === "success" && (
-                      <motion.div key="success" initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.5, opacity: 0 }} className="flex items-center gap-2 text-green-100">
-                        <CheckCircle size={20} />
-                        <span>Message Sent Successfully!</span>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  <Send size={20} />
+                  Send Message
                 </motion.button>
-              </form>
-
+              </a>
               <AnimatePresence>
                 {status === "success" && (
                   <motion.div
