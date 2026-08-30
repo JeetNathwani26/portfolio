@@ -72,7 +72,7 @@ const ProjectCard = ({ project, index }) => {
             href={project.github}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-4 rounded-full bg-white/10 hover:bg-[color:var(--page-primary)] text-white transition-colors transform translate-y-8 group-hover:translate-y-0 duration-500 delay-100"
+            className="p-4 rounded-full bg-[color:var(--page-primary)] text-white transition-colors transform translate-y-8 group-hover:translate-y-0 duration-500 delay-100"
           >
             <Github size={24} />
           </a>
@@ -81,7 +81,7 @@ const ProjectCard = ({ project, index }) => {
               href={project.live}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-4 rounded-full bg-white/10 hover:bg-[color:var(--page-primary)] text-white transition-colors transform translate-y-8 group-hover:translate-y-0 duration-500 delay-150"
+              className="p-4 rounded-full bg-[color:var(--page-primary)] text-white transition-colors transform translate-y-8 group-hover:translate-y-0 duration-500 delay-150"
             >
               <ExternalLink size={24} />
             </a>
@@ -135,7 +135,7 @@ const ProjectCard = ({ project, index }) => {
             href={project.live !== "#" ? project.live : project.github}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white bg-[color:var(--page-text)] hover:bg-[color:var(--page-primary)] transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white bg-[color:var(--page-primary)] transition-colors"
           >
             {project.live !== "#" ? "View Live Project" : "View Source Code"}
             <ArrowRight size={18} />
