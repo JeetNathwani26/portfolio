@@ -19,15 +19,6 @@ const floatingCards = [
 const floatingCardsBeforeImage = floatingCards.slice(0, 2);
 const floatingCardsAfterImage = floatingCards.slice(2);
 
-const OrbitRing = ({ className }) => (
-  <motion.div
-    aria-hidden="true"
-    className={`absolute inset-0 rounded-full border border-[rgba(124,58,237,0.18)] ${className}`}
-    animate={{ rotate: 360 }}
-    transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
-  />
-);
-
 const GlowBackground = () => (
   <div className="absolute inset-0 pointer-events-none">
     <motion.div
@@ -93,10 +84,8 @@ const HeroImage = () => (
   >
     <GlowBackground />
     <div className="absolute inset-0 z-10">
-      <div className="absolute inset-[10%] rounded-full border border-white/55 bg-white/70 backdrop-blur-[18px] shadow-[0_30px_90px_rgba(91,33,182,0.14)]" />
-      <OrbitRing className="inset-[7%]" />
-      <OrbitRing className="inset-[14%] opacity-50" />
-      <div className="absolute inset-[20%] rounded-full border border-dashed border-[rgba(124,58,237,0.16)] opacity-80" />
+      {/* Keep the portrait free of a white backdrop; the violet glow grounds it from below. */}
+      <div className="absolute bottom-[8%] left-1/2 h-[34%] w-[76%] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.58)_0%,rgba(109,40,217,0.3)_42%,rgba(76,29,149,0)_74%)] blur-2xl" />
 
       {floatingCardsBeforeImage.map((card, index) => (
         <FloatingCard
