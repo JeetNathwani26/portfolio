@@ -10,7 +10,10 @@ import Resume from './por/Resume.jsx';
 import Skills from './por/Skills.jsx';
 import Footer from './por/Footer.jsx';
 import IntroLoader from './por/IntroLoader.jsx';
+import ResumeChatbot from './por/ResumeChatbot.jsx';
+import ChatbotPage from './por/ChatbotPage.jsx';
 function App() {
+  const isChatbotPage = window.location.pathname === '/chatbot';
   const [showIntro, setShowIntro] = useState(true);
   const [theme, setTheme] = useState(() => {
     const savedTheme = window.localStorage.getItem("portfolio-theme");
@@ -50,6 +53,7 @@ function App() {
   };
 
   return (
+    isChatbotPage ? <ChatbotPage /> :
     <>
       <AnimatePresence>
         {showIntro && (
@@ -77,6 +81,7 @@ function App() {
           <Resume />
           <Contact />
           <Footer />
+          <ResumeChatbot />
         </div>
       </div>
     </>
