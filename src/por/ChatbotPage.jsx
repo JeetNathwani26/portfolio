@@ -132,7 +132,7 @@ export default function ChatbotPage() {
             <h2>Welcome, Jeet!</h2>
             <p><FormattedMessage text={greeting.text} /></p>
           </div>
-        ) : <div key={`${message.role}-${index}`} className={`chatbot-message-row ${message.role === "user" ? "chatbot-message-row--user" : ""}`}>
+        ) : index === 0 && message.role === "model" ? null : <div key={`${message.role}-${index}`} className={`chatbot-message-row ${message.role === "user" ? "chatbot-message-row--user" : ""}`}>
           <div className={`chatbot-bubble ${message.role === "user" ? "chatbot-bubble--user" : "chatbot-bubble--bot"}`}>
             {message.role === "user" ? <FormattedMessage text={message.text} /> : <TypingMessage text={message.text} />}
           </div>
