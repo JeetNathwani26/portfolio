@@ -3,7 +3,7 @@ import { ArrowLeft, Send } from "lucide-react";
 import ChatIcon from "./ChatIcon";
 import "./Chatbot.css";
 
-const API_URL = import.meta.env.VITE_CHAT_API_URL?.replace(/\/$/, "");
+const API_URL = (import.meta.env.VITE_CHAT_API_URL || "https://portfolio-chatbot-2-6nem.onrender.com").replace(/\/$/, "");
 const greeting = { role: "model", text: "Hi! Ask me anything about Jeet's experience, skills, or projects." };
 const placeholderPrompts = [
   "Ask about skills",

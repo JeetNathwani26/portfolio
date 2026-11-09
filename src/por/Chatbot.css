@@ -12,9 +12,11 @@
 
 .chatbot-page {
   min-height: 100vh;
+  min-height: 100dvh;
   color: var(--text);
   background: var(--page-bg);
   font-family: "Plus Jakarta Sans", sans-serif;
+  overflow: hidden;
 }
 
 .chatbot-header {
@@ -75,7 +77,7 @@
 }
 
 .chatbot-content {
-  width: min(920px, calc(100% - 32px));
+  width: min(920px, calc(100% - 48px));
   margin: 32px auto 0;
 }
 
@@ -83,7 +85,7 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  height: min(560px, calc(100vh - 260px));
+  height: min(560px, calc(100dvh - 260px));
   min-height: 280px;
   overflow-y: auto;
   scrollbar-width: none;
@@ -160,6 +162,7 @@
   padding: 14px 20px;
   font-size: 17px;
   line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .chatbot-bubble p {
@@ -252,6 +255,7 @@
   font: inherit;
   font-size: 17px;
   outline: none;
+  box-sizing: border-box;
 }
 
 .chatbot-input:focus {
@@ -326,10 +330,24 @@
   box-sizing: border-box;
 }
 
+@media (max-width: 900px) {
+  .chatbot-header {
+    padding: 0 24px;
+  }
+
+  .chatbot-content {
+    width: min(720px, calc(100% - 32px));
+  }
+
+  .chatbot-bubble {
+    max-width: 82%;
+  }
+}
+
 @media (max-width: 640px) {
   .chatbot-header {
     height: 80px;
-    padding: 0 16px;
+    padding: 0 12px;
   }
 
   .chatbot-profile-subtitle {
@@ -337,7 +355,7 @@
   }
 
   .chatbot-profile-title {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .chatbot-avatar--header {
@@ -348,26 +366,69 @@
 
   .chatbot-back {
     font-size: 14px;
+    white-space: nowrap;
   }
 
   .chatbot-content {
-    margin-top: 16px;
+    width: calc(100% - 24px);
+    margin-top: 10px;
   }
 
   .chatbot-messages {
-    height: max(380px, calc(200vh - 250px));
-    min-height: 260px;
-    padding: 20px 0;
+    height: calc(100dvh - 190px);
+    min-height: 240px;
+    padding: 16px 0;
+    gap: 18px;
   }
 
   .chatbot-bubble {
-    max-width: calc(100% - 46px);
+    max-width: 88%;
+    padding: 12px 16px;
     font-size: 15px;
+  }
+
+  .chatbot-welcome {
+    min-height: 150px;
+    padding: 0 12px;
+  }
+
+  .chatbot-welcome h2 {
+    font-size: 21px;
+  }
+
+  .chatbot-welcome p {
+    font-size: 14px;
   }
 
   .chatbot-suggestions {
     grid-template-columns: 1fr;
     max-width: 100%;
+    gap: 8px;
+    padding-top: 12px;
+  }
+
+  .chatbot-suggestion {
+    min-height: 0;
+    padding: 12px;
+  }
+
+  .chatbot-input-bar {
+    gap: 8px;
+    height: 62px;
+    margin-top: 10px;
+    padding-top: 6px;
+  }
+
+  .chatbot-input {
+    height: 56px;
+    padding: 0 16px;
+    font-size: 15px;
+  }
+
+  .chatbot-send {
+    width: 52px;
+    height: 52px;
+    flex-basis: 52px;
   }
 
   .chat-launcher {
