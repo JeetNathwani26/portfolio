@@ -55,7 +55,7 @@ function TypingMessage({ text }) {
   return <FormattedMessage text={visibleText} />;
 }
 
-export default function ChatbotPage() {
+export default function ChatbotPage({ backendStatus }) {
   const [messages, setMessages] = useState([greeting]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -97,6 +97,15 @@ export default function ChatbotPage() {
 
   const sendMessage = async (text) => {
     if (!text || loading) return;
+    if (backendStatus !== "ready") {
+      setMessages((current) => [...current, {
+        role: "model",
+        text: backendStatus === "unavailable"
+          ? "The chatbot is temporarily unavailable. Please try again later."
+          : "The chatbot server is starting. Please try again in a moment.",
+      }]);
+      return;
+    }
     const nextMessages = [...messages, { role: "user", text }];
     setMessages(nextMessages);
     setInput("");
@@ -122,7 +131,7 @@ export default function ChatbotPage() {
   return <main className="chatbot-page">
     <header className="chatbot-header flex items-center justify-between">
       <a href="/" className="chatbot-back" aria-label="Back to portfolio"><ArrowLeft size={20} /> Back to portfolio</a>
-      <div className="chatbot-header-profile"><span className="chatbot-avatar chatbot-avatar--header"><ChatIcon size={28} /></span><div><h1 className="chatbot-profile-title">Ask about Jeet</h1><p className="chatbot-profile-subtitle">Resume assistant</p></div></div>
+      <div className="chatbot-header-profile"><span className="chatbot-avatar chatbot-avatar--header"><ChatIcon size={28} /></span><div><h1 className="chatbot-profile-title">Ask about Jeet</h1><p className="chatbot-profile-subtitle">Resume assistant</p><p className={`chatbot-status chatbot-status--${backendStatus}`}>{backendStatus === "ready" ? "Online" : backendStatus === "unavailable" ? "Unavailable" : "Starting..."}</p></div></div>
     </header>
     <section className="chatbot-content">
       <div ref={listRef} className="chatbot-messages" aria-live="polite">
@@ -146,8 +155,8 @@ export default function ChatbotPage() {
         </div>}
       </div>
       <form onSubmit={send} className="chatbot-input-bar">
-        <input value={input} onChange={(event) => setInput(event.target.value)} maxLength={2000} disabled={loading} className="chatbot-input" placeholder={placeholder} aria-label="Your question" autoFocus />
-        <button type="submit" disabled={loading || !input.trim()} className="chatbot-send" aria-label="Send message"><Send size={21} /></button>
+        <input value={input} onChange={(event) => setInput(event.target.value)} maxLength={2000} disabled={loading || backendStatus !== "ready"} className="chatbot-input" placeholder={backendStatus === "ready" ? placeholder : "Connecting to chatbot…"} aria-label="Your question" autoFocus />
+        <button type="submit" disabled={loading || backendStatus !== "ready" || !input.trim()} className="chatbot-send" aria-label="Send message"><Send size={21} /></button>
       </form>
     </section>
   </main>;

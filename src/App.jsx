@@ -12,8 +12,10 @@ import Footer from './por/Footer.jsx';
 import IntroLoader from './por/IntroLoader.jsx';
 import ResumeChatbot from './por/ResumeChatbot.jsx';
 import ChatbotPage from './por/ChatbotPage.jsx';
+import useBackendHealth from './hooks/useBackendHealth.js';
 function App() {
   const isChatbotPage = window.location.pathname === '/chatbot';
+  const backendStatus = useBackendHealth();
   const [showIntro, setShowIntro] = useState(true);
   const [theme, setTheme] = useState(() => {
     const savedTheme = window.localStorage.getItem("portfolio-theme");
@@ -53,7 +55,7 @@ function App() {
   };
 
   return (
-    isChatbotPage ? <ChatbotPage /> :
+    isChatbotPage ? <ChatbotPage backendStatus={backendStatus} /> :
     <>
       <AnimatePresence>
         {showIntro && (
@@ -89,4 +91,3 @@ function App() {
 }
 
 export default App;
-
