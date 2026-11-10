@@ -55,7 +55,7 @@ function App() {
   };
 
   return (
-    isChatbotPage ? <ChatbotPage backendStatus={backendStatus} /> :
+    isChatbotPage ? <ChatbotPage backendStatus={backendStatus} theme={theme} /> :
     <>
       <AnimatePresence>
         {showIntro && (

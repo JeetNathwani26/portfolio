@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Send } from "lucide-react";
 import ChatIcon from "./ChatIcon";
-import "./Chatbot.css";
 
 const API_URL = (import.meta.env.VITE_CHAT_API_URL || "https://portfolio-chatbot-2-6nem.onrender.com").replace(/\/$/, "");
 const greeting = { role: "model", text: "Hi! Ask me anything about Jeet's experience, skills, or projects." };
@@ -55,7 +54,13 @@ function TypingMessage({ text }) {
   return <FormattedMessage text={visibleText} />;
 }
 
-export default function ChatbotPage({ backendStatus }) {
+export default function ChatbotPage({ backendStatus, theme }) {
+  const isDark = theme === "dark";
+  const pageBackground = isDark ? "bg-[#09090b]" : "bg-[#f8f7ff]";
+  const surface = isDark ? "bg-[#09090b]" : "bg-white";
+  const text = isDark ? "text-white" : "text-[#0f172a]";
+  const muted = isDark ? "text-[#a1a1aa]" : "text-[#475569]";
+  const border = isDark ? "border-white/10" : "border-[#e8e6f8]";
   const [messages, setMessages] = useState([greeting]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -128,35 +133,35 @@ export default function ChatbotPage({ backendStatus }) {
     sendMessage(input.trim());
   };
 
-  return <main className="chatbot-page">
-    <header className="chatbot-header flex items-center justify-between">
-      <a href="/" className="chatbot-back" aria-label="Back to portfolio"><ArrowLeft size={20} /> Back to portfolio</a>
-      <div className="chatbot-header-profile"><span className="chatbot-avatar chatbot-avatar--header"><ChatIcon size={28} /></span><div><h1 className="chatbot-profile-title">Ask about Jeet</h1><p className="chatbot-profile-subtitle">Resume assistant</p><p className={`chatbot-status chatbot-status--${backendStatus}`}>{backendStatus === "ready" ? "Online" : backendStatus === "unavailable" ? "Unavailable" : "Starting..."}</p></div></div>
+  return <main className={`flex min-h-screen min-h-[100dvh] flex-col overflow-hidden font-sans ${pageBackground} ${text}`}>
+    <header className={`flex h-20 shrink-0 items-center justify-between border-b px-3 sm:h-[104px] sm:px-6 lg:px-14 ${surface} ${border}`}>
+      <a href="/" className={`inline-flex items-center gap-2 whitespace-nowrap text-sm font-medium no-underline sm:text-[17px] ${muted}`} aria-label="Back to portfolio"><ArrowLeft size={20} className="text-[#4f46e5]" /> Back to portfolio</a>
+      <div className="flex items-center gap-2 text-right sm:gap-3"><span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[13px] bg-[#4f46e5] shadow-[0_8px_18px_rgba(79,70,229,.3)] sm:h-[52px] sm:w-[52px] sm:rounded-2xl"><ChatIcon size={28} /></span><div><h1 className={`m-0 text-sm font-extrabold sm:text-lg ${text}`}>Ask about Jeet</h1><p className={`m-0 mt-0.5 text-xs font-medium sm:text-sm ${muted}`}>Resume assistant</p><p className={`m-0 mt-0.5 text-[11px] font-bold ${backendStatus === "ready" ? "text-[#22c55e]" : backendStatus === "unavailable" ? "text-red-600" : muted}`}>{backendStatus === "ready" ? "Online" : backendStatus === "unavailable" ? "Unavailable" : "Starting..."}</p></div></div>
     </header>
-    <section className="chatbot-content">
-      <div ref={listRef} className="chatbot-messages" aria-live="polite">
+    <section className="mx-auto flex w-[calc(100%-24px)] min-w-0 flex-1 flex-col sm:w-[calc(100%-32px)] lg:w-[min(920px,calc(100%-48px))]">
+      <div ref={listRef} className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto py-4 [scrollbar-width:none] sm:gap-6 sm:py-8 [&::-webkit-scrollbar]:hidden" aria-live="polite">
         {messages.map((message, index) => messages.length === 1 && index === 0 ? (
-          <div key={`${message.role}-${index}`} className="chatbot-welcome">
-            <span className="chatbot-welcome-icon"><ChatIcon size={28} /></span>
-            <h2>Welcome, Jeet!</h2>
-            <p><FormattedMessage text={greeting.text} /></p>
+          <div key={`${message.role}-${index}`} className="flex min-h-[150px] flex-col items-center justify-center px-3 text-center sm:min-h-[180px]">
+            <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-[18px] bg-[#4f46e5] shadow-[0_8px_18px_rgba(79,70,229,.3)]"><ChatIcon size={28} /></span>
+            <h2 className={`m-0 text-[21px] font-extrabold sm:text-2xl ${text}`}>Welcome, Jeet!</h2>
+            <p className={`m-2 max-w-[460px] text-sm leading-6 sm:text-base ${muted}`}><FormattedMessage text={greeting.text} /></p>
           </div>
-        ) : index === 0 && message.role === "model" ? null : <div key={`${message.role}-${index}`} className={`chatbot-message-row ${message.role === "user" ? "chatbot-message-row--user" : ""}`}>
-          <div className={`chatbot-bubble ${message.role === "user" ? "chatbot-bubble--user" : "chatbot-bubble--bot"}`}>
+        ) : index === 0 && message.role === "model" ? null : <div key={`${message.role}-${index}`} className={`flex items-end gap-2 ${message.role === "user" ? "justify-end" : ""}`}>
+          <div className={`max-w-[88%] break-words px-4 py-3 text-[15px] leading-relaxed sm:max-w-[82%] sm:text-[17px] ${message.role === "user" ? "rounded-[20px_20px_6px_20px] bg-[#4f46e5] px-[22px] font-medium text-white" : `rounded-[20px_20px_20px_6px] ${text}`}`}>
             {message.role === "user" ? <FormattedMessage text={message.text} /> : <TypingMessage text={message.text} />}
           </div>
         </div>)}
-        {loading && <div className="chatbot-message-row"><div className="chatbot-bubble chatbot-bubble--bot">Thinking…</div></div>}
-        {messages.length === 1 && !loading && <div className="chatbot-suggestions">
-          {suggestedPrompts.map((prompt) => <button key={prompt.title} type="button" className="chatbot-suggestion" onClick={() => sendMessage(prompt.text)}>
-            <strong>{prompt.title}</strong>
-            <span>{prompt.text}</span>
+        {loading && <div className="flex items-end gap-2"><div className={`max-w-[88%] break-words rounded-[20px_20px_20px_6px] px-4 py-3 text-[15px] leading-relaxed sm:text-[17px] ${text}`}>Thinking…</div></div>}
+        {messages.length === 1 && !loading && <div className="mx-auto grid w-full max-w-[720px] grid-cols-1 gap-2.5 pt-3 sm:grid-cols-3 sm:gap-3 sm:pt-5">
+          {suggestedPrompts.map((prompt) => <button key={prompt.title} type="button" className={`flex min-h-0 flex-col gap-1.5 rounded-2xl border p-3 text-left font-sans transition hover:-translate-y-0.5 hover:border-[#4f46e5] hover:shadow-[0_8px_18px_rgba(79,70,229,.12)] sm:min-h-[82px] sm:p-4 ${surface} ${border}`} onClick={() => sendMessage(prompt.text)}>
+            <strong className={`text-[15px] ${text}`}>{prompt.title}</strong>
+            <span className={`text-[13px] ${muted}`}>{prompt.text}</span>
           </button>)}
         </div>}
       </div>
-      <form onSubmit={send} className="chatbot-input-bar">
-        <input value={input} onChange={(event) => setInput(event.target.value)} maxLength={2000} disabled={loading || backendStatus !== "ready"} className="chatbot-input" placeholder={backendStatus === "ready" ? placeholder : "Connecting to chatbot…"} aria-label="Your question" autoFocus />
-        <button type="submit" disabled={loading || backendStatus !== "ready" || !input.trim()} className="chatbot-send" aria-label="Send message"><Send size={21} /></button>
+      <form onSubmit={send} className="flex h-[62px] shrink-0 gap-2 pb-1 pt-1.5 sm:h-[70px] sm:gap-3.5 sm:pt-3.5">
+        <input value={input} onChange={(event) => setInput(event.target.value)} maxLength={2000} disabled={loading || backendStatus !== "ready"} className={`min-w-0 flex-1 rounded-[28px] border-2 bg-transparent px-4 text-[15px] outline-none focus:border-[#4f46e5] focus:ring-4 focus:ring-[#e0e7ff] sm:px-[22px] sm:text-[17px] ${border} ${text}`} placeholder={backendStatus === "ready" ? placeholder : "Connecting to chatbot…"} aria-label="Your question" autoFocus />
+        <button type="submit" disabled={loading || backendStatus !== "ready" || !input.trim()} className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full bg-[#4f46e5] text-white hover:bg-[#4338ca] disabled:cursor-not-allowed disabled:opacity-50 sm:h-14 sm:w-14" aria-label="Send message"><Send size={21} /></button>
       </form>
     </section>
   </main>;
