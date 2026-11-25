@@ -53,7 +53,7 @@ function App() {
   };
 
   return (
-    isChatbotPage ? <ChatbotPage theme={theme} theme={theme} /> :
+    isChatbotPage ? <ChatbotPage theme={theme} /> :
     <>
       <AnimatePresence>
         {showIntro && (
