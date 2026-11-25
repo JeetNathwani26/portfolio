@@ -4,12 +4,13 @@ import {
   RotateCcw,
   Sparkles,
   ExternalLink,
-  Mic,
   Send,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import jeetAvatar from "../assets/jeet-avatar.png";
-import jeetAvatarAnimated from "../assets/jeet-avatar-animated.gif";
+import jeetAvatar from "../assets/jeet-avatar-new.png";
+import avatarVideo from "../assets/jeet-wave.webm";
 
 const API_URL = (import.meta.env.VITE_CHAT_API_URL || "https://portfolio-chatbot-2-6nem.onrender.com").replace(/\/$/, "");
 
@@ -136,8 +137,21 @@ function TypingMessage({ text }) {
   return <FormattedMessage text={visibleText} />;
 }
 
-export default function ChatbotPage({ backendStatus, theme }) {
-  const isDark = theme === "dark";
+export default function ChatbotPage({ theme: propTheme }) {
+  const backendStatus = "ready";
+  const [localTheme, setLocalTheme] = useState(() => {
+    // ChatbotPage manages its own theme when opened in a new tab
+    return propTheme || window.localStorage.getItem("portfolio-theme") || "light";
+  });
+  const isDark = localTheme === "dark";
+
+  const toggleTheme = () => {
+    setLocalTheme(prev => {
+      const next = prev === "dark" ? "light" : "dark";
+      window.localStorage.setItem("portfolio-theme", next);
+      return next;
+    });
+  };
   const [messages, setMessages] = useState([greeting]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -145,6 +159,40 @@ export default function ChatbotPage({ backendStatus, theme }) {
   const [isAvatarHovered, setIsAvatarHovered] = useState(false);
   const listRef = useRef(null);
   const inputRef = useRef(null);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const animFrameRef = useRef(null);
+
+  // Sync localTheme to <html data-theme> so CSS variables and dark: classes apply correctly
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", localTheme);
+  }, [localTheme]);
+
+  const handleAvatarMouseEnter = () => {
+    setIsAvatarHovered(true);
+    const video = videoRef.current;
+    if (video) {
+      video.currentTime = 0;
+      video.play().catch(() => {});
+    }
+  };
+
+  const handleAvatarMouseLeave = () => {
+    setIsAvatarHovered(false);
+    const video = videoRef.current;
+    if (video) {
+      video.pause();
+      video.currentTime = 0;
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (animFrameRef.current) {
+        cancelAnimationFrame(animFrameRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     let promptIndex = 0;
@@ -205,20 +253,63 @@ export default function ChatbotPage({ backendStatus, theme }) {
 
     try {
       if (!API_URL) throw new Error("Chat API is not configured");
-      const response = await fetch(`${API_URL}/chat`, {
+
+      // Filter out any fallback messages and limit to max 4 (backend schema limit)
+      let cleanHistory = nextMessages
+        .filter(
+          (m) =>
+            !m.text.includes("trouble connecting") &&
+            !m.text.includes("currently asleep") &&
+            !m.text.includes("taking a moment to respond") &&
+            !m.text.includes("rate limit was temporarily reached")
+        )
+        .slice(-4);
+
+      let response = await fetch(`${API_URL}/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: nextMessages.slice(-5) }),
+        body: JSON.stringify({ messages: cleanHistory }),
       });
-      if (!response.ok) throw new Error("Chat request failed");
+
+      // If backend rejected due to history size, retry immediately with just the current message
+      if (!response.ok && cleanHistory.length > 1) {
+        response = await fetch(`${API_URL}/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: [{ role: "user", text: messageText }] }),
+        });
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        const errMsg = errorData?.detail || errorData?.message || `HTTP ${response.status}: ${response.statusText}`;
+        throw new Error(errMsg);
+      }
+
       const { reply } = await response.json();
       setMessages((current) => [...current, { role: "model", text: reply }]);
-    } catch {
+    } catch (err) {
+      console.error("Chat API request error:", err);
+      let errorText =
+        "I'm temporarily having trouble connecting to the server. Feel free to contact Jeet directly via email or LinkedIn!";
+
+      if (err.message?.includes("429")) {
+        errorText = "The AI rate limit was temporarily reached. Please wait a few seconds and try asking again!";
+      } else if (
+        err.message?.includes("504") ||
+        err.message?.includes("502") ||
+        err.message?.includes("Failed to fetch") ||
+        err.name === "TypeError"
+      ) {
+        errorText =
+          "The backend server is waking up from sleep (Render free tier). Please wait a few moments and try asking again!";
+      }
+
       setMessages((current) => [
         ...current,
         {
           role: "model",
-          text: "I'm temporarily having trouble connecting to the server. Feel free to contact Jeet directly via email or LinkedIn!",
+          text: errorText,
         },
       ]);
     } finally {
@@ -250,22 +341,24 @@ export default function ChatbotPage({ backendStatus, theme }) {
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
         }
-        .avatar-soft-glow {
-          background: radial-gradient(circle at 50% 30%, #ffffff 0%, #f1f5f9 60%, #e2e8f0 100%);
-          box-shadow: 
-            0 10px 30px -5px rgba(124, 58, 237, 0.18),
-            0 20px 40px -15px rgba(99, 102, 241, 0.15),
-            inset 0 2px 4px rgba(255, 255, 255, 0.9);
+        @keyframes marquee {
+          0% { transform: translateX(0%); }
+          100% { transform: translateX(-50%); }
         }
-        .avatar-soft-glow-dark {
-          background: radial-gradient(circle at 50% 30%, #1e1b4b 0%, #0f172a 60%, #020617 100%);
-          box-shadow: 
-            0 10px 30px -5px rgba(124, 58, 237, 0.35),
-            0 20px 40px -15px rgba(99, 102, 241, 0.25),
-            inset 0 1px 2px rgba(255, 255, 255, 0.1);
+        .animate-marquee {
+          display: flex;
+          width: max-content;
+          animation: marquee 30s linear infinite;
         }
-        .ambient-halo {
-          background: radial-gradient(circle, rgba(167, 139, 250, 0.24) 0%, rgba(243, 232, 255, 0.08) 55%, transparent 75%);
+        .animate-marquee:hover {
+          animation-play-state: paused;
+        }
+        .chat-scroll-area {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        .chat-scroll-area::-webkit-scrollbar {
+          display: none;
         }
       `}</style>
 
@@ -353,6 +446,21 @@ export default function ChatbotPage({ backendStatus, theme }) {
               <RotateCcw size={15} />
             </button>
           )}
+
+          {/* Theme Toggle */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            className={`flex h-9 w-9 items-center justify-center rounded-full border transition-all ${
+              isDark
+                ? "border-white/10 bg-[#131620] text-amber-400 hover:text-amber-300 hover:border-amber-500/40"
+                : "border-slate-200/80 bg-white text-slate-500 hover:text-violet-600 hover:border-violet-300"
+            }`}
+            aria-label="Toggle theme"
+          >
+            {isDark ? <Sun size={15} /> : <Moon size={15} />}
+          </button>
         </div>
       </header>
       {/* END: MainHeader */}
@@ -361,105 +469,92 @@ export default function ChatbotPage({ backendStatus, theme }) {
       <div className="relative flex min-h-0 flex-1 flex-col w-full overflow-hidden">
         <div
           ref={listRef}
-          className="flex-1 min-h-0 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6"
+          className="chat-scroll-area flex-1 min-h-0 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6"
           style={{ WebkitOverflowScrolling: "touch" }}
         >
           {messages.length === 1 ? (
             /* BEGIN: MainContentHero */
-            <main className="flex-1 flex flex-col items-center justify-center px-4 py-4 sm:py-8 max-w-4xl mx-auto w-full text-center relative z-10">
+            <main className="flex-1 min-h-full flex flex-col items-center justify-center my-auto px-4 py-6 sm:py-8 max-w-4xl mx-auto w-full text-center relative z-10">
               {/* Soft Decorative Ambient Glow behind avatar */}
-              <div className="absolute -top-12 w-96 h-96 ambient-halo pointer-events-none -z-10 rounded-full blur-2xl" />
 
-              {/* Free-floating Character Avatar (No circle, no cutoff, transparent cutout view) */}
-              <div className="relative mb-6 group" data-purpose="hero-avatar-container">
-                {/* Soft Decorative Ambient Halo behind avatar */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 sm:w-56 sm:h-56 ambient-halo pointer-events-none rounded-full blur-2xl opacity-80 -z-10" />
+              {/* Avatar — fixed-size container prevents ANY layout shift (CLS = 0) */}
+              <div className="relative mb-4 sm:mb-5" data-purpose="hero-avatar-container">
+                {/* Ambient halo — decorative only, does not affect layout */}
 
+                {/*
+                  ┌─ outer: reserves EXACTLY w-40 h-40 / md:w-56 md:h-56 at all times ─┐
+                  │  overflow-hidden clips any stray canvas pixels.                      │
+                  │  Both children are absolute + inset-0 so they never change size.     │
+                  └─────────────────────────────────────────────────────────────────────┘
+                */}
                 <div
-                  className="relative w-40 h-40 sm:w-48 sm:h-48 flex items-center justify-center transition-all duration-300 transform group-hover:scale-105 cursor-pointer"
-                  onMouseEnter={() => setIsAvatarHovered(true)}
-                  onMouseLeave={() => setIsAvatarHovered(false)}
+                  className="relative w-[100px] h-[100px] rounded-full overflow-hidden cursor-pointer"
+                  style={{ flexShrink: 0 }}
+                  onMouseEnter={handleAvatarMouseEnter}
+                  onMouseLeave={handleAvatarMouseLeave}
                   onClick={() => sendMessage("Hi! Can you give me a quick intro about Jeet and what he does?")}
                 >
+                  {/* Waving transparent WebM video on hover */}
+                  <video
+                    ref={videoRef}
+                    src={avatarVideo}
+                    poster={jeetAvatar}
+                    playsInline
+                    muted
+                    loop
+                    preload="auto"
+                    className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 pointer-events-none scale-[1.32] -translate-y-[12%] ${
+                      isAvatarHovered ? "opacity-100 z-10" : "opacity-0 z-0"
+                    }`}
+                  />
+
+                  {/* Static avatar image — shown when not hovering */}
                   <img
                     alt="Jeet Avatar"
-                    className="w-full h-full object-contain filter drop-shadow-[0_12px_25px_rgba(124,58,237,0.22)] transition-transform duration-300 group-hover:scale-105"
-                    src={isAvatarHovered ? jeetAvatarAnimated : jeetAvatar}
+                    src={jeetAvatar}
+                    className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 pointer-events-none scale-[1.32] -translate-y-[12%] ${
+                      isAvatarHovered ? "opacity-0 z-0" : "opacity-100 z-10"
+                    }`}
                   />
-                  {/* Subtle hover prompt pill overlay */}
-                  <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-slate-900/80 text-white text-[10px] font-medium tracking-wide shadow-md backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                    {isAvatarHovered ? "Playing GIF ✨" : "Hover Me 👋"}
-                  </span>
-                </div>
-
-                {/* Refined Online Active Badge */}
-                <div
-                  className={`absolute bottom-2 right-2 sm:right-4 p-1 rounded-full shadow-md border ${
-                    isDark ? "bg-[#131620] border-white/10" : "bg-white border-slate-100"
-                  }`}
-                  title="Online and ready"
-                >
-                  <div className="w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white dark:border-[#131620] flex items-center justify-center">
-                    <span className="w-full h-full rounded-full bg-emerald-400 animate-ping opacity-75" />
-                  </div>
                 </div>
               </div>
 
               {/* Hero Titles & Subtitle */}
-              <div className="space-y-3 max-w-2xl mx-auto mb-6 sm:mb-8" data-purpose="hero-heading">
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight">
+              <div className="space-y-2 max-w-2xl mx-auto mb-5 sm:mb-6" data-purpose="hero-heading">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight leading-tight">
                   Welcome! Ask about <span className="text-gradient">Jeet</span>
                 </h1>
-                <p className={`text-sm sm:text-base leading-relaxed max-w-xl mx-auto font-normal ${isDark ? "text-slate-300" : "text-slate-600"}`}>
-                  Explore Jeet's full-stack expertise, AI systems, featured projects, or ask any question about his career experience.
-                </p>
               </div>
 
-              {/* Primary Single Hero CTA */}
-              <div className="mb-8 sm:mb-10" data-purpose="primary-call-to-action">
-                <button
-                  type="button"
-                  onClick={() => sendMessage("Hi! Can you give me a quick intro about Jeet and what he does?")}
-                  className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-600 hover:from-violet-700 hover:via-indigo-700 hover:to-purple-700 text-white font-semibold text-sm shadow-lg shadow-indigo-200 dark:shadow-indigo-950/50 hover:shadow-indigo-300 hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-2"
-                >
-                  <motion.span
-                    className="text-base inline-block origin-[70%_70%]"
-                    animate={{ rotate: [0, 16, -10, 16, -5, 12, 0] }}
-                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 1.5, ease: "easeInOut" }}
-                  >
-                    👋
-                  </motion.span>
-                  <span>Say Hi to Jeet's AI</span>
-                </button>
-              </div>
-
-              {/* Quick Suggestion Action Pills */}
+              {/* Running Line Animated Prompt Pills */}
               <div
-                className="w-full max-w-2xl flex flex-wrap items-center justify-center gap-2.5 mb-4 sm:mb-8"
-                data-purpose="quick-prompts"
+                className="w-full max-w-2xl overflow-hidden mb-4 sm:mb-6 [mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)]"
+                data-purpose="quick-prompts-running-line"
               >
-                {quickPills.map((pill) => (
-                  <button
-                    key={pill.label}
-                    type="button"
-                    onClick={() => sendMessage(pill.query)}
-                    className={`group flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-full shadow-xs hover:shadow-sm transition-all ${
-                      isDark
-                        ? "text-slate-200 bg-[#131620] hover:bg-[#1a1e2d] border border-white/10 hover:border-violet-400"
-                        : "text-slate-700 bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-violet-300"
-                    }`}
-                  >
-                    <span className={`${pill.iconColor} group-hover:scale-110 transition-transform`}>
-                      {pill.icon}
-                    </span>
-                    <span>{pill.label}</span>
-                  </button>
-                ))}
+                <div className="animate-marquee flex items-center gap-2.5 py-1">
+                  {[...quickPills, ...quickPills].map((pill, idx) => (
+                    <button
+                      key={`${pill.label}-${idx}`}
+                      type="button"
+                      onClick={() => sendMessage(pill.query)}
+                      className={`group shrink-0 flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-full shadow-xs hover:shadow-sm transition-all cursor-pointer ${
+                        isDark
+                          ? "text-slate-200 bg-[#131620] hover:bg-[#1a1e2d] border border-white/10 hover:border-violet-400"
+                          : "text-slate-700 bg-white hover:bg-slate-50 border border-slate-200/90 hover:border-violet-300"
+                      }`}
+                    >
+                      <span className={`${pill.iconColor} group-hover:scale-110 transition-transform`}>
+                        {pill.icon}
+                      </span>
+                      <span>{pill.label}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
             </main>
           ) : (
             /* BEGIN: ChatMessageThread */
-            <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 sm:gap-5 py-4">
+            <div className="mx-auto flex w-4/5 max-w-6xl flex-col gap-4 sm:gap-5 py-4 px-2 sm:px-4">
               {messages.map((message, index) => {
                 const isUser = message.role === "user";
                 return (
@@ -481,7 +576,7 @@ export default function ChatbotPage({ backendStatus, theme }) {
                     )}
 
                     <div
-                      className={`max-w-[85%] break-words rounded-2xl px-4 py-3 text-sm leading-relaxed sm:max-w-[78%] sm:text-[15px] ${
+                      className={`max-w-[92%] break-words rounded-2xl px-4 sm:px-5 py-3 text-sm leading-relaxed sm:max-w-[85%] lg:max-w-[80%] sm:text-[15px] ${
                         isUser
                           ? "rounded-tr-sm bg-gradient-to-r from-violet-600 to-indigo-600 font-medium text-white shadow-md shadow-indigo-200 dark:shadow-indigo-950/40"
                           : `rounded-tl-sm border shadow-xs ${
@@ -535,7 +630,7 @@ export default function ChatbotPage({ backendStatus, theme }) {
 
       {/* BEGIN: ChatDockFooter */}
       <footer className="w-full pb-4 sm:pb-6 pt-2 px-4 sm:px-6 relative z-20 shrink-0">
-        <div className="max-w-2xl mx-auto flex flex-col items-center">
+        <div className="w-full max-w-2xl mx-auto flex flex-col items-center">
           {/* Quick pills bar inside chat when thread has started */}
           {messages.length > 1 && (
             <div className="w-full flex items-center gap-2 overflow-x-auto py-1 mb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -581,18 +676,21 @@ export default function ChatbotPage({ backendStatus, theme }) {
               type="text"
             />
 
-            {/* Mic / Voice Action Icon */}
+            {/* Overview Button */}
             <button
-              aria-label="Voice input"
+              aria-label="Overview for Jeet"
               type="button"
-              onClick={() => sendMessage("Can you give me an overview of Jeet's skills and projects?")}
-              className={`p-2 transition-colors rounded-full ${
+              onClick={() => sendMessage("Can you give me a comprehensive overview of Jeet, including his background, core technical skills, and top projects?")}
+              disabled={loading || backendStatus !== "ready"}
+              title="Overview of Jeet"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 ${
                 isDark
-                  ? "text-slate-400 hover:text-slate-200 hover:bg-white/5"
-                  : "text-slate-400 hover:text-slate-600 hover:bg-slate-100"
-              }`}
+                  ? "bg-violet-500/15 text-violet-300 hover:bg-violet-500/25 border border-violet-500/30"
+                  : "bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-200"
+              } disabled:opacity-40 disabled:cursor-not-allowed`}
             >
-              <Mic className="w-5 h-5" />
+              <Sparkles className="w-3.5 h-3.5 text-violet-500 shrink-0" />
+              <span>Overview</span>
             </button>
 
             {/* Send Button */}
