@@ -1,4 +1,7 @@
+import { useRef, useState } from "react";
+import { MessageCircle } from "lucide-react";
 import ChatIcon from "./ChatIcon";
+import avatar from "../assets/jeet-avatar-circle.jpg";
 import "./Chatbot.css";
 
 export default function ResumeChatbot({ theme = "light" }) {
@@ -26,7 +29,10 @@ export default function ResumeChatbot({ theme = "light" }) {
   return (
     <div>
       <button type="button" onClick={() => window.open("/chatbot", "_blank", "noopener,noreferrer")} className="chat-launcher" aria-label="Open Jeet's resume chat in a new tab">
-        <ChatIcon size={32} />
+        <img className="chat-launcher__avatar" src={avatar} alt="" />
+        <span className="chat-launcher__helper" aria-hidden="true">
+          <MessageCircle size={16} strokeWidth={2.5} />
+        </span>
         <span className="chat-launcher__dot" />
       </button>
     </div>

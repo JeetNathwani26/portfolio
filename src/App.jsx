@@ -14,7 +14,8 @@ import ResumeChatbot from './por/ResumeChatbot.jsx';
 import ChatbotPage from './por/ChatbotPage.jsx';
 function App() {
   const isChatbotPage = window.location.pathname === '/chatbot';
-  const [showIntro, setShowIntro] = useState(true);
+  // Don't gate first render on browser storage; storage can be unavailable.
+  const [showIntro, setShowIntro] = useState(false);
   const [theme, setTheme] = useState(() => {
     const savedTheme = window.localStorage.getItem("portfolio-theme");
     if (savedTheme) {
